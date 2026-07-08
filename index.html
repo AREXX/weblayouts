@@ -164,19 +164,22 @@ section{position:relative;z-index:2;padding:110px 40px;}
 .pcard:hover{background:var(--surface-2);}
 .pthumb{height:210px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);
   display:flex;align-items:center;justify-content:center;background:var(--surface-2);}
-.pthumb .glyph{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;color:var(--fog);
-  letter-spacing:.08em;z-index:2;background:rgba(243,241,234,.85);padding:6px 12px;border:1px solid var(--line-strong);}
+.pthumb .glyph{position:absolute;top:8px;left:8px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:12px;color:var(--fog);
+  letter-spacing:.08em;z-index:3;background:rgba(243,241,234,.85);padding:4px 9px;border:1px solid var(--line-strong);}
 #work .pthumb .glyph{background:rgba(7,8,10,.6);}
+.pthumb-frame{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);
+  transform-origin:0 0;border:none;pointer-events:none;background:var(--bg-canvas);}
 .pthumb .sweep{position:absolute;top:0;left:-30%;width:30%;height:100%;
   background:linear-gradient(90deg,transparent,var(--signal-soft),transparent);
-  transition:left .6s ease;z-index:1;}
+  transition:left .6s ease;z-index:2;}
 .pcard:hover .sweep{left:130%;}
-.pthumb .bracket{position:absolute;width:14px;height:14px;opacity:0;transition:opacity .2s;}
+.pthumb .bracket{position:absolute;width:14px;height:14px;opacity:0;transition:opacity .2s;z-index:3;}
 .pcard:hover .bracket{opacity:1;}
 .bracket.tl{top:8px;left:8px;border-top:1px solid var(--signal);border-left:1px solid var(--signal);}
 .bracket.tr{top:8px;right:8px;border-top:1px solid var(--signal);border-right:1px solid var(--signal);}
 .bracket.bl{bottom:8px;left:8px;border-bottom:1px solid var(--signal);border-left:1px solid var(--signal);}
 .bracket.br{bottom:8px;right:8px;border-bottom:1px solid var(--signal);border-right:1px solid var(--signal);}
+
 
 .pinfo{padding:20px 22px 24px;display:flex;flex-direction:column;flex:1;}
 .prow-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
@@ -489,14 +492,19 @@ function renderGrid(filter){
   const list = filter==='all' ? PROJECTS : PROJECTS.filter(p=>p.cat===filter);
   list.forEach((p)=>{
     const globalIdx = PROJECTS.indexOf(p);
+    const hasLink = p.link && p.link !== '#';
     const card = document.createElement('article');
     card.className = 'pcard';
     card.innerHTML = `
-      <div class="pthumb" style="background-image:${thumbPattern(globalIdx)};background-size:16px 16px;">
+      <div class="pthumb" ${hasLink ? '' : `style="background-image:${thumbPattern(globalIdx)};background-size:16px 16px;"`}>
+        ${hasLink
+          ? `<iframe class="pthumb-frame" src="${p.link}" tabindex="-1" loading="lazy" sandbox="allow-same-origin" title="${p.name} preview"></iframe>`
+          : `<span class="glyph" style="position:static;">${CAT_CODE[p.cat]}.${String(globalIdx+1).padStart(2,'0')}</span>`
+        }
         <div class="sweep"></div>
         <div class="bracket tl"></div><div class="bracket tr"></div>
         <div class="bracket bl"></div><div class="bracket br"></div>
-        <span class="glyph">${CAT_CODE[p.cat]}.${String(globalIdx+1).padStart(2,'0')}</span>
+        ${hasLink ? `<span class="glyph">${CAT_CODE[p.cat]}.${String(globalIdx+1).padStart(2,'0')}</span>` : ''}
       </div>
       <div class="pinfo">
         <div class="prow-top">
