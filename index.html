@@ -49,8 +49,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     var d = document.getElementById('__bundler_err') || p.appendChild(document.createElement('div'));
     d.id = '__bundler_err';
     d.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;font:12px/1.4 ui-monospace,monospace;background:#2a1215;color:#ff8a80;padding:10px 14px;border-radius:8px;border:1px solid #5c2b2e;z-index:99999;white-space:pre-wrap;max-height:40vh;overflow:auto';
+    var target = e.target;
+    var targetInfo = '';
+    if (target && target !== window && target.tagName) {
+      var src = target.src || target.href || '';
+      targetInfo = ' [' + target.tagName + (src ? ': ' + src.slice(0, 100) : ' — no src') + ']';
+    }
     d.textContent = (d.textContent ? d.textContent + String.fromCharCode(10) : '') +
-      '[bundle] ' + (e.message || e.type) +
+      '[bundle] ' + (e.message || e.type) + targetInfo +
       (e.filename ? ' (' + e.filename.slice(0, 60) + ':' + e.lineno + ')' : '');
   }, true);
 
