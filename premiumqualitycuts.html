@@ -38,6 +38,9 @@ a:hover{color:#7c5c0d}
   .pqc-heroL{border-right:none!important}
   .pqc-heroR{min-height:340px!important;border-top:2px solid color-mix(in srgb,#201e1d 40%,transparent)}
   .pqc-mapframe{height:340px!important}
+  .pqc-hoursgrid{grid-template-columns:1fr!important;max-width:360px!important;margin:0!important}
+  .pqc-hoursgrid > div{padding-left:0!important;border-left:none!important}
+  .pqc-hoursgrid > div:last-child{border-top:1px solid color-mix(in srgb,#201e1d 40%,transparent);margin-top:4px;padding-top:4px}
   .pqc-visitfacts{grid-template-columns:1fr!important}
   .pqc-vf{padding:18px 0!important;border-left:none!important;border-top:1px solid color-mix(in srgb,#201e1d 40%,transparent)}
   .pqc-vf:first-child{border-top:none!important;padding-top:0!important}
@@ -165,9 +168,9 @@ html.force-desktop .pqc-csub{font-size:17px!important}
 html.force-desktop .pqc-bbt{font-size:25px!important}
 html.force-desktop .pqc-bbs{font-size:17px!important}
 html.force-desktop .pqc-bookbar a{font-size:17px!important}
-html.force-desktop #hours-list > div{max-width:none!important}
 html.force-desktop #hours-list span:first-child{font-size:17px!important}
-html.force-desktop #hours-list > div > span:last-child{font-size:20px!important}
+html.force-desktop #hours-list > div > div > span:last-child{font-size:20px!important}
+html.force-desktop .pqc-hoursgrid{max-width:820px!important}
 html.force-desktop .pqc-vf a{font-size:19px!important;line-height:1.5!important}
 html.force-desktop .pqc-vf a[href^="tel"]{font-size:30px!important}
 html.force-desktop .pqc-vflabel{font-size:14px!important}
@@ -403,7 +406,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       <h2 style="font:800 40px/1 'Archivo',sans-serif;margin:0">WHEN WE'RE OPEN</h2>
       <span id="hours-status"></span>
     </div>
-    <div id="hours-list" style="max-width:560px"></div>
+    <div id="hours-list"></div>
   </div>
 
   <!-- visit / location -->
@@ -542,18 +545,23 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     "</div>";
   document.getElementById("menu-list").innerHTML = html;
 
-  // ---- hours ----
-  var hh = "";
-  HOURS.forEach(function (h) {
-    hh +=
-      '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid ' + LINE + ';max-width:360px">' +
-        '<span style="display:flex;align-items:center;gap:10px;font:600 13px/1 \'Archivo\',sans-serif;letter-spacing:.06em;text-transform:uppercase;opacity:.7">' +
-          '<span style="width:7px;height:7px;border-radius:50%;background:' + (h.open ? "#a97e12" : "#bab6b6") + ';display:inline-block"></span>' + h.day +
-        "</span>" +
-        '<span style="font:800 15px/1 \'Archivo\',sans-serif' + (h.open ? "" : ";opacity:.45") + '">' + h.time + "</span>" +
-      "</div>";
-  });
-  document.getElementById("hours-list").innerHTML = hh;
+  // ---- hours: two columns (Mon-Thu | Fri-Sun) so the block reads as centered, not stranded ----
+  function hourRow(h) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid ' + LINE + '">' +
+      '<span style="display:flex;align-items:center;gap:10px;font:600 13px/1 \'Archivo\',sans-serif;letter-spacing:.06em;text-transform:uppercase;opacity:.7">' +
+        '<span style="width:7px;height:7px;border-radius:50%;background:' + (h.open ? "#a97e12" : "#bab6b6") + ';display:inline-block"></span>' + h.day +
+      "</span>" +
+      '<span style="font:800 15px/1 \'Archivo\',sans-serif' + (h.open ? "" : ";opacity:.45") + '">' + h.time + "</span>" +
+    "</div>";
+  }
+  var hLeft = "", hRight = "";
+  HOURS.slice(0, 4).forEach(function (h) { hLeft += hourRow(h); });
+  HOURS.slice(4).forEach(function (h) { hRight += hourRow(h); });
+  document.getElementById("hours-list").innerHTML =
+    '<div class="pqc-hoursgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:0 48px;max-width:720px;margin:0 auto">' +
+      '<div>' + hLeft + '</div>' +
+      '<div style="border-left:1px solid ' + LINE + ';padding-left:48px">' + hRight + '</div>' +
+    '</div>';
 
   // ---- reviews department ----
   // Aggregate (4.9 / 57) verified against the live Google listing — Jul 2026.
