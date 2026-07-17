@@ -6,6 +6,9 @@
 // ---------------------------------------------------------------------------
 
 const CONN = process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
+// PGlite is for local dev/test only; a deployed (serverless) environment must
+// use a real database. Detect the common serverless runtimes.
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.AWS_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
 let _clientPromise = null;
 
@@ -17,6 +20,12 @@ async function makeClient() {
     if (!globalThis.WebSocket) neonConfig.webSocketConstructor = (await import("ws")).default;
     const pool = new Pool({ connectionString: CONN });
     return { query: (text, params) => pool.query(text, params) };
+  }
+  if (IS_SERVERLESS) {
+    // No DB configured on a deployment — fail clearly so the API reports itself
+    // offline and the page falls back to the consistent on-device flow (rather
+    // than using ephemeral in-memory storage that would lose data between requests).
+    throw new Error("No DATABASE_URL configured. Add a database in Vercel → Storage → Neon.");
   }
   // local / test — WASM Postgres, no server needed
   const { PGlite } = await import("@electric-sql/pglite");
