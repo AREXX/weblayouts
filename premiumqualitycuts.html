@@ -272,7 +272,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     <a href="#reviews" style="font:600 13px/1 'Archivo',sans-serif;letter-spacing:.04em;text-transform:uppercase">Reviews</a>
     <a href="#hours" style="font:600 13px/1 'Archivo',sans-serif;letter-spacing:.04em;text-transform:uppercase">Hours</a>
     <a href="https://www.instagram.com/resethebarber/" target="_blank" rel="noopener" style="font:600 13px/1 'Archivo',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#a97e12">Instagram</a>
-    <a class="pqc-navbook" href="https://premiumqualitycuts.glossgenius.com/book" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;font:800 13px/1.2 'Archivo',sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:12px 20px;border-radius:0">Book Now</a>
+    <a class="pqc-navbook" href="#book-now" data-book style="display:inline-flex;align-items:center;font:800 13px/1.2 'Archivo',sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:12px 20px;border-radius:0">Book Now</a>
   </div>
 
   <!-- hero -->
@@ -286,7 +286,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
         <h1 style="font:800 76px/.98 'Archivo',sans-serif;letter-spacing:-.02em;margin:0 0 28px;max-width:640px">PRECISION CUTS.<br>NO SHORTCUTS.</h1>
         <p style="font-size:17px;line-height:1.6;max-width:460px;opacity:.8;margin:0 0 40px">Hot towel, invigorating shampoo, a finishing razor line — the full ritual, executed by hand, every single visit.</p>
         <div class="pqc-ctas" style="display:flex;gap:16px;margin-bottom:40px">
-          <a href="https://premiumqualitycuts.glossgenius.com/book" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;font:800 14px/1.2 'Archivo',sans-serif;letter-spacing:.02em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:16px 28px">Book an appointment</a>
+          <a href="#book-now" data-book style="display:inline-flex;align-items:center;font:800 14px/1.2 'Archivo',sans-serif;letter-spacing:.02em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:16px 28px">Book an appointment</a>
           <a href="tel:+18327144153" style="display:inline-flex;align-items:center;font:800 14px/1.2 'Archivo',sans-serif;color:#201e1d;border:1px solid color-mix(in srgb,#201e1d 40%,transparent);padding:16px 28px">(832) 714-4153</a>
         </div>
         <div id="hero-facts" style="display:flex;align-items:center;gap:28px;border-top:1px solid color-mix(in srgb,#201e1d 40%,transparent);padding-top:20px;flex-wrap:wrap">
@@ -365,7 +365,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     </div>
     <div style="height:2px;background:color-mix(in srgb,#201e1d 40%,transparent);margin-bottom:4px"></div>
     <div id="menu-list"></div>
-    <noscript><div style="padding:24px 0;font-size:14px">Full menu &amp; prices: <a href="https://premiumqualitycuts.glossgenius.com/book">book online here</a>.</div></noscript>
+    <noscript><div style="padding:24px 0;font-size:14px">Full menu &amp; prices &mdash; call <a href="tel:+18327144153">(832) 714-4153</a> to book.</div></noscript>
   </div>
 
   <!-- reviews department — real Google reviews, rendered from GREV data -->
@@ -442,11 +442,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
   <!-- book -->
   <div id="book" style="background:#201e1d;color:#f3f2f2;padding:100px 56px;text-align:center;border-bottom:2px solid color-mix(in srgb,#201e1d 40%,transparent)">
     <h2 style="font:800 clamp(32px,4.5vw,52px)/1.08 'Archivo',sans-serif;margin:0 auto 18px;color:#f3f2f2">BOOK YOUR<br>APPOINTMENT</h2>
-    <p style="font-size:16px;line-height:1.6;opacity:.7;max-width:440px;margin:0 auto 36px">A small deposit locks your slot — no account, no wait.</p>
+    <p style="font-size:16px;line-height:1.6;opacity:.7;max-width:440px;margin:0 auto 36px">Pick a service, day and time right here — no app, no account, works even offline.</p>
     <div class="pqc-ctas" style="display:flex;justify-content:center">
-      <a href="https://premiumqualitycuts.glossgenius.com/book" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;font:800 15px/1.2 'Archivo',sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:18px 36px">Book Online <span class="pqc-ar pqc-ar-ne">↗</span></a>
+      <a href="#book-now" data-book style="display:inline-flex;align-items:center;font:800 15px/1.2 'Archivo',sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:18px 36px">Book Online <span class="pqc-ar pqc-ar-ne">↗</span></a>
     </div>
-    <div class="pqc-note" style="font-size:12px;opacity:.5;margin-top:18px">Opens in a new tab — instant confirmation once you pick a time.</div>
+    <div class="pqc-note" style="font-size:12px;opacity:.5;margin-top:18px">Instant confirmation, add-to-calendar and a text-to-confirm the moment you pick a time.</div>
   </div>
 
   <!-- footer -->
@@ -459,7 +459,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
 </div>
 <script>
 (function () {
-  var GG = "https://premiumqualitycuts.glossgenius.com/book";
+  var GG = "#book-now";
   var LINE = "color-mix(in srgb,#201e1d 40%,transparent)";
 
   // Source of truth: premiumqualitycuts.glossgenius.com/services (verified Jul 2026)
@@ -541,7 +541,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
         '<div class="pqc-bbt" style="font:800 20px/1.2 \'Archivo\',sans-serif">Ready to book?</div>' +
         '<div class="pqc-bbs" style="font-size:13px;opacity:.65;margin-top:5px">Your deposit locks the slot — takes about a minute.</div>' +
       "</div>" +
-      '<a href="' + GG + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;font:800 13px/1.2 \'Archivo\',sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:15px 24px">Book Your Appointment <span class="pqc-ar pqc-ar-e">→</span></a>' +
+      '<a href="' + GG + '" data-book style="display:inline-flex;align-items:center;font:800 13px/1.2 \'Archivo\',sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#201e1d;background:#d9a520;padding:15px 24px">Book Your Appointment <span class="pqc-ar pqc-ar-e">→</span></a>' +
     "</div>";
   document.getElementById("menu-list").innerHTML = html;
 
@@ -797,7 +797,638 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     (st.open ? "color:#7c5c0d" : "opacity:.65") + '"><span class="pqc-dot' + (st.open ? " live" : "") + '"></span>' + st.label + "</span>";
   document.getElementById("hero-facts").insertAdjacentHTML("afterbegin", chip);
   document.getElementById("hours-status").innerHTML = chip;
+
+  // Expose shop data as the single source of truth for the in-page booking engine.
+  window.PQC = { GROUPS: GROUPS, HOURS: HOURS, SCHED: SCHED, DAYN: DAYN, fmtMin: fmtMin, esc: esc };
 })();
 </script>
+
+  <!-- ============================================================================
+       IN-PAGE BOOKING ENGINE — self-contained, works offline, phone-first.
+       Replaces the external GlossGenius flow. No backend, no account:
+       services + hours come from window.PQC (single source of truth), bookings
+       persist in localStorage, and the booked slot is confirmed by an add-to-
+       calendar file + a pre-filled text to the shop. Everything below is namespaced
+       .pqcb- / #pqcb- so it can't collide with the page above.
+  ============================================================================ -->
+  <style>
+  .pqcb{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;
+        font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#201e1d}
+  .pqcb[hidden]{display:none}
+  .pqcb *{box-sizing:border-box}
+  .pqcb-scrim{position:absolute;inset:0;background:rgba(20,18,17,.62);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);animation:pqcb-fade .2s ease}
+  .pqcb-card{position:relative;width:min(600px,96vw);max-height:92vh;background:#f3f2f2;border-radius:16px;
+             display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 90px -20px rgba(20,18,17,.7);animation:pqcb-rise .28s cubic-bezier(.2,.7,.2,1)}
+  @keyframes pqcb-fade{from{opacity:0}to{opacity:1}}
+  @keyframes pqcb-rise{from{opacity:0;transform:translateY(26px) scale(.985)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.pqcb-scrim,.pqcb-card{animation:none}}
+
+  .pqcb-top{display:flex;align-items:center;gap:12px;background:#201e1d;color:#f3f2f2;padding:16px 18px}
+  .pqcb-titles{flex:1;min-width:0}
+  .pqcb-kicker{font:800 10px/1 'Archivo',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#d9a520;margin-bottom:6px}
+  .pqcb-title{font:800 19px/1.15 'Archivo',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pqcb-ic{width:38px;height:38px;flex:none;border:0;border-radius:50%;background:rgba(243,242,242,.1);color:#f3f2f2;
+           font-size:17px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .15s}
+  .pqcb-ic:hover{background:rgba(243,242,242,.2)}
+  .pqcb-ic[hidden]{display:none}
+
+  .pqcb-steps{display:flex;gap:6px;padding:14px 18px 4px;background:#f3f2f2}
+  .pqcb-steps i{flex:1;height:4px;border-radius:3px;background:color-mix(in srgb,#201e1d 12%,transparent);transition:background .3s}
+  .pqcb-steps i.on{background:#d9a520}
+  .pqcb-steps i.done{background:#a97e12}
+
+  .pqcb-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px}
+  .pqcb-foot{border-top:1px solid color-mix(in srgb,#201e1d 12%,transparent);padding:14px 18px;
+             display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f3f2f2}
+  .pqcb-foot[hidden]{display:none}
+
+  .pqcb-h{font:800 22px/1.15 'Archivo',sans-serif;margin:2px 0 4px}
+  .pqcb-sub{font-size:13.5px;line-height:1.5;opacity:.62;margin:0 0 16px}
+
+  .pqcb-btn{appearance:none;border:0;cursor:pointer;font:800 14px/1 'Archivo',sans-serif;letter-spacing:.03em;text-transform:uppercase;
+            color:#201e1d;background:#d9a520;padding:15px 24px;border-radius:8px;display:inline-flex;align-items:center;gap:8px;transition:filter .15s,transform .05s}
+  .pqcb-btn:hover{filter:brightness(1.05)}.pqcb-btn:active{transform:translateY(1px)}
+  .pqcb-btn:disabled{opacity:.4;cursor:not-allowed}
+  .pqcb-btn.wide{width:100%;justify-content:center}
+  .pqcb-btn2{appearance:none;cursor:pointer;font:800 13px/1 'Archivo',sans-serif;letter-spacing:.03em;text-transform:uppercase;
+             color:#201e1d;background:transparent;border:1.5px solid color-mix(in srgb,#201e1d 22%,transparent);padding:14px 20px;border-radius:8px;
+             display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:border-color .15s,background .15s}
+  .pqcb-btn2:hover{border-color:#a97e12;background:color-mix(in srgb,#d9a520 10%,transparent)}
+  .pqcb-btn2.wide{width:100%}
+  .pqcb-link{background:none;border:0;padding:6px 2px;cursor:pointer;font:700 12.5px/1 'Archivo',sans-serif;color:#7c5c0d;text-decoration:underline;text-underline-offset:3px}
+
+  /* service list */
+  .pqcb-search{width:100%;padding:13px 16px;border:1.5px solid color-mix(in srgb,#201e1d 15%,transparent);border-radius:10px;
+               font:600 15px/1 'Archivo',sans-serif;background:#fff;color:#201e1d;margin-bottom:18px}
+  .pqcb-search:focus{outline:none;border-color:#d9a520}
+  .pqcb-gh{font:800 11px/1 'Archivo',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#7c5c0d;margin:20px 2px 10px}
+  .pqcb-gh:first-child{margin-top:0}
+  .pqcb-srow{width:100%;text-align:left;background:#fff;border:1.5px solid color-mix(in srgb,#201e1d 12%,transparent);border-radius:12px;
+             padding:15px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color .15s,box-shadow .15s,transform .05s}
+  .pqcb-srow:hover{border-color:#d9a520;box-shadow:0 4px 16px -8px rgba(32,30,29,.4)}
+  .pqcb-srow:active{transform:translateY(1px)}
+  .pqcb-srow.sel{border-color:#a97e12;box-shadow:inset 0 0 0 1px #a97e12}
+  .pqcb-sinfo{flex:1;min-width:0}
+  .pqcb-sname{font:800 15.5px/1.25 'Archivo',sans-serif}
+  .pqcb-snote{font-size:12.5px;line-height:1.4;opacity:.6;margin-top:3px}
+  .pqcb-smeta{font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.55;margin-top:6px}
+  .pqcb-sprice{text-align:right;flex:none}
+  .pqcb-sprice b{font:800 19px/1 'Archivo',sans-serif;color:#a97e12}
+  .pqcb-sarrow{flex:none;color:#a97e12;font-size:20px;opacity:.5}
+
+  /* calendar */
+  .pqcb-calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .pqcb-calhead b{font:800 17px/1 'Archivo',sans-serif}
+  .pqcb-nav{width:40px;height:40px;border-radius:10px;border:1.5px solid color-mix(in srgb,#201e1d 15%,transparent);background:#fff;
+            cursor:pointer;font-size:18px;color:#201e1d;display:inline-flex;align-items:center;justify-content:center;transition:border-color .15s}
+  .pqcb-nav:hover:not(:disabled){border-color:#a97e12}
+  .pqcb-nav:disabled{opacity:.3;cursor:not-allowed}
+  .pqcb-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+  .pqcb-dow span{text-align:center;font:800 10px/1 'Archivo',sans-serif;letter-spacing:.05em;text-transform:uppercase;opacity:.45;padding:4px 0}
+  .pqcb-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .pqcb-day{aspect-ratio:1;border:1.5px solid transparent;border-radius:10px;background:#fff;cursor:pointer;
+            font:700 15px/1 'Archivo',sans-serif;color:#201e1d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:border-color .15s,background .15s}
+  .pqcb-day.empty{background:transparent;cursor:default}
+  .pqcb-day:not(.off):not(.empty):hover{border-color:#d9a520}
+  .pqcb-day.off{color:color-mix(in srgb,#201e1d 30%,transparent);cursor:not-allowed;background:color-mix(in srgb,#201e1d 3%,transparent)}
+  .pqcb-day.sel{background:#201e1d;color:#f3f2f2;border-color:#201e1d}
+  .pqcb-day i{width:5px;height:5px;border-radius:50%;background:#d9a520;display:block}
+  .pqcb-day.sel i{background:#d9a520}
+  .pqcb-day.off i{display:none}
+
+  /* slots */
+  .pqcb-slotgrp{margin-bottom:18px}
+  .pqcb-slotgrp b{font:800 11px/1 'Archivo',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#7c5c0d;display:block;margin-bottom:10px}
+  .pqcb-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+  .pqcb-slot{padding:13px 8px;border:1.5px solid color-mix(in srgb,#201e1d 14%,transparent);border-radius:10px;background:#fff;
+             cursor:pointer;font:800 14px/1 'Archivo',sans-serif;color:#201e1d;transition:border-color .15s,background .15s,transform .05s}
+  .pqcb-slot:hover{border-color:#d9a520}
+  .pqcb-slot:active{transform:translateY(1px)}
+  .pqcb-slot.sel{background:#201e1d;color:#f3f2f2;border-color:#201e1d}
+
+  /* summary chip strip (top of time/details/review) */
+  .pqcb-recap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .pqcb-chip{display:inline-flex;align-items:center;gap:7px;background:color-mix(in srgb,#201e1d 5%,#fff);border:1px solid color-mix(in srgb,#201e1d 12%,transparent);
+             border-radius:999px;padding:8px 13px;font:700 12.5px/1 'Archivo',sans-serif}
+  .pqcb-chip s{text-decoration:none;color:#a97e12}
+  .pqcb-chip button{background:none;border:0;color:#7c5c0d;cursor:pointer;font:800 11px/1 'Archivo',sans-serif;text-decoration:underline;text-underline-offset:2px;padding:0 0 0 2px}
+
+  /* form */
+  .pqcb-field{margin-bottom:14px}
+  .pqcb-field label{display:block;font:800 11px/1 'Archivo',sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:7px}
+  .pqcb-field input,.pqcb-field textarea{width:100%;padding:13px 15px;border:1.5px solid color-mix(in srgb,#201e1d 15%,transparent);border-radius:10px;
+             font:600 15px/1.4 'Archivo',sans-serif;background:#fff;color:#201e1d;resize:vertical}
+  .pqcb-field input:focus,.pqcb-field textarea:focus{outline:none;border-color:#d9a520}
+  .pqcb-field.bad input{border-color:#c0392b}
+  .pqcb-err{color:#c0392b;font:600 12px/1.3 'Archivo',sans-serif;margin-top:6px;display:none}
+  .pqcb-field.bad .pqcb-err{display:block}
+
+  /* review + confirmed */
+  .pqcb-receipt{background:#fff;border:1px solid color-mix(in srgb,#201e1d 12%,transparent);border-radius:14px;overflow:hidden;margin-bottom:16px}
+  .pqcb-rrow{display:flex;justify-content:space-between;gap:16px;padding:14px 16px;border-bottom:1px solid color-mix(in srgb,#201e1d 8%,transparent);font-size:14px}
+  .pqcb-rrow:last-child{border-bottom:0}
+  .pqcb-rrow span{opacity:.55;font-weight:600}
+  .pqcb-rrow b{font-weight:800;text-align:right}
+  .pqcb-rrow.big b{font-size:18px;color:#a97e12}
+  .pqcb-note{font-size:12.5px;line-height:1.55;opacity:.7;background:color-mix(in srgb,#d9a520 12%,transparent);
+             border-left:3px solid #d9a520;padding:12px 14px;border-radius:0 8px 8px 0;margin-bottom:16px}
+  .pqcb-check{width:72px;height:72px;border-radius:50%;background:#d9a520;color:#201e1d;display:flex;align-items:center;justify-content:center;
+              font-size:38px;margin:6px auto 14px;animation:pqcb-pop .4s cubic-bezier(.2,.8,.2,1.2)}
+  @keyframes pqcb-pop{from{transform:scale(0)}to{transform:none}}
+  .pqcb-ref{text-align:center;font:800 13px/1 'Archivo',sans-serif;letter-spacing:.14em;color:#7c5c0d;background:color-mix(in srgb,#d9a520 14%,transparent);
+            display:inline-block;padding:8px 16px;border-radius:8px;margin:0 auto}
+
+  .pqcb-empty{text-align:center;padding:40px 10px;opacity:.6;font-size:14px;line-height:1.6}
+  .pqcb-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);z-index:100000;
+              background:#201e1d;color:#f3f2f2;font:700 13.5px/1.3 'Archivo',sans-serif;padding:14px 22px;border-radius:10px;
+              box-shadow:0 14px 40px -10px rgba(20,18,17,.7);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;max-width:88vw;text-align:center}
+  .pqcb-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:560px){
+    .pqcb{padding:0;align-items:flex-end}
+    .pqcb-card{width:100%;max-height:94vh;border-radius:18px 18px 0 0}
+  }
+  </style>
+
+  <div id="pqcb-root" class="pqcb" hidden>
+    <div class="pqcb-scrim" data-close></div>
+    <div class="pqcb-card" role="dialog" aria-modal="true" aria-labelledby="pqcb-title">
+      <div class="pqcb-top">
+        <button class="pqcb-ic" id="pqcb-back" type="button" aria-label="Go back" hidden>&#8249;</button>
+        <div class="pqcb-titles">
+          <div class="pqcb-kicker" id="pqcb-kicker">Premium Quality Cuts</div>
+          <div class="pqcb-title" id="pqcb-title">Book an appointment</div>
+        </div>
+        <button class="pqcb-ic" id="pqcb-close" type="button" aria-label="Close">&#10005;</button>
+      </div>
+      <div class="pqcb-steps" id="pqcb-steps" aria-hidden="true"></div>
+      <div class="pqcb-body" id="pqcb-body"></div>
+      <div class="pqcb-foot" id="pqcb-foot"></div>
+    </div>
+  </div>
+  <div class="pqcb-toast" id="pqcb-toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (function () {
+    var PQC = window.PQC || {};
+    var GROUPS = PQC.GROUPS || [];
+    var SCHED  = PQC.SCHED  || [null,null,null,null,null,null,null];
+    var DAYN   = PQC.DAYN   || ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var fmtMin = PQC.fmtMin || function (m) { var h=Math.floor(m/60),mm=m%60,ap=h>=12?"PM":"AM",hh=h%12||12; return hh+(mm?":"+("0"+mm).slice(-2):"")+" "+ap; };
+
+    var SHOP  = { name:"Premium Quality Cuts", tel:"+18327144153", telH:"(832) 714-4153",
+                  addr:"6850 Hwy 6 Ste 600, Missouri City, TX 77459" };
+    var LSK = "pqc.bookings.v1";
+    var STEP_BUFFER = 10;   // minutes of breathing room between appointments
+    var TODAY_LEAD  = 90;   // no same-day slot within 90 min from now
+
+    // ---- helpers ----
+    function money(s){ var m=String(s||"").match(/([\d]+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; }
+    function mins(s){ var m=String(s||"").match(/(\d+)\s*min/); return m?parseInt(m[1],10):30; }
+    function pad(n){ return (n<10?"0":"")+n; }
+    function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+    // flatten services (single source of truth = the printed menu)
+    var SERVICES = [];
+    GROUPS.forEach(function (g, gi) {
+      (g.items||[]).forEach(function (it, ii) {
+        SERVICES.push({ id:"s"+gi+"_"+ii, group:g.label, name:it.name, note:it.note||"",
+          price:it.price, priceNum:money(it.price), dur:it.dur, durMin:mins(it.dur),
+          dep:it.dep||"", depNum:money(it.dep) });
+      });
+    });
+    function svc(id){ for(var i=0;i<SERVICES.length;i++) if(SERVICES[i].id===id) return SERVICES[i]; return null; }
+
+    // ---- storage ----
+    function load(){ try{ return JSON.parse(localStorage.getItem(LSK))||[]; }catch(e){ return []; } }
+    function store(a){ try{ localStorage.setItem(LSK, JSON.stringify(a)); }catch(e){} }
+    function active(){ return load().filter(function(b){ return b.status!=="cancelled"; }); }
+    function upcoming(){
+      var t=ymd(new Date());
+      return active().filter(function(b){ return b.ymd>=t; })
+        .sort(function(a,b){ return a.ymd===b.ymd ? a.start-b.start : (a.ymd<b.ymd?-1:1); });
+    }
+
+    // ---- date utils (device-local) ----
+    function ymd(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+    function fromYmd(s){ var p=s.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
+    function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+    function midnight(d){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
+    function prettyDate(s){ return fromYmd(s).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"}); }
+    function prettyShort(s){ return fromYmd(s).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}); }
+
+    function busyFor(y){
+      return active().filter(function(b){ return b.ymd===y; })
+        .map(function(b){ return { start:b.start, end:b.start+b.durMin }; });
+    }
+    function slotsFor(dateObj, durMin){
+      var sc = SCHED[dateObj.getDay()]; if(!sc) return [];
+      var open=sc[0], close=sc[1], step=30, out=[];
+      var busy=busyFor(ymd(dateObj));
+      var now=new Date(), today=sameDay(dateObj,now), nowMin=now.getHours()*60+now.getMinutes();
+      for(var t=open; t+durMin<=close; t+=step){
+        if(today && t < nowMin+TODAY_LEAD) continue;
+        var end=t+durMin, clash=false;
+        for(var i=0;i<busy.length;i++){
+          if(t < busy[i].end+STEP_BUFFER && end+STEP_BUFFER > busy[i].start){ clash=true; break; }
+        }
+        if(!clash) out.push(t);
+      }
+      return out;
+    }
+
+    // ---- state ----
+    var S = { step:"service", sid:null, ymd:null, start:null, cal:null,
+              name:"", phone:"", email:"", notes:"", q:"", ref:null };
+    var STEPS = ["service","date","time","details","review"];
+
+    // ---- DOM ----
+    var root=document.getElementById("pqcb-root"),
+        elBody=document.getElementById("pqcb-body"),
+        elFoot=document.getElementById("pqcb-foot"),
+        elSteps=document.getElementById("pqcb-steps"),
+        elTitle=document.getElementById("pqcb-title"),
+        elKick=document.getElementById("pqcb-kicker"),
+        elBack=document.getElementById("pqcb-back"),
+        elClose=document.getElementById("pqcb-close"),
+        elToast=document.getElementById("pqcb-toast");
+    var lastFocus=null, toastTimer=null;
+
+    function toast(msg){
+      elToast.textContent=msg; elToast.classList.add("show");
+      clearTimeout(toastTimer); toastTimer=setTimeout(function(){ elToast.classList.remove("show"); },2600);
+    }
+
+    function open(sid){
+      lastFocus=document.activeElement;
+      S.step="service"; S.q="";
+      if(sid){ S.sid=sid; S.step="date"; if(!S.cal) S.cal=midnight(new Date()); }
+      root.hidden=false;
+      document.documentElement.style.overflow="hidden";
+      document.body.style.overflow="hidden";
+      render();
+    }
+    function close(){
+      root.hidden=true;
+      document.documentElement.style.overflow="";
+      document.body.style.overflow="";
+      if(lastFocus&&lastFocus.focus) try{ lastFocus.focus(); }catch(e){}
+    }
+
+    // ---- step navigation ----
+    function go(step){ S.step=step; render(); if(elBody) elBody.scrollTop=0; }
+    function back(){
+      var map={date:"service",time:"date",details:"time",review:"details",mine:"service"};
+      if(map[S.step]) go(map[S.step]); else close();
+    }
+
+    // ---- renderers ----
+    function progress(){
+      var idx=STEPS.indexOf(S.step);
+      var h="";
+      STEPS.forEach(function(_,i){ h+='<i class="'+(i<idx?"done":i===idx?"on":"")+'"></i>'; });
+      elSteps.innerHTML=h;
+      elSteps.style.display = (S.step==="mine"||idx<0) ? "none" : "flex";
+    }
+
+    var TITLES={service:"Choose a service",date:"Pick a day",time:"Pick a time",
+                details:"Your details",review:"Review & confirm",done:"You're booked",mine:"My appointments"};
+
+    function render(){
+      progress();
+      elTitle.textContent=TITLES[S.step]||"Book an appointment";
+      elBack.hidden = !(S.step in {date:1,time:1,details:1,review:1,mine:1});
+      elClose.hidden = false;
+      ({service:rService,date:rDate,time:rTime,details:rDetails,review:rReview,done:rDone,mine:rMine}[S.step]||rService)();
+      var first=elBody.querySelector("input, button, .pqcb-srow, .pqcb-day:not(.off)");
+      if(first && S.step!=="details") { /* leave focus to user on lists */ }
+    }
+
+    // STEP 1 — service
+    function rService(){
+      var up=upcoming(), q=S.q.trim().toLowerCase();
+      var banner = up.length ?
+        '<button class="pqcb-btn2 wide" data-mine style="margin-bottom:16px">You have '+up.length+' upcoming &middot; view / manage</button>' : "";
+      var list="", curGroup=null, shown=0;
+      SERVICES.forEach(function(s){
+        if(q){
+          var hay=(s.name+" "+s.note+" "+s.group).toLowerCase();
+          if(hay.indexOf(q)<0) return;
+        }
+        shown++;
+        if(s.group!==curGroup){ curGroup=s.group; list+='<div class="pqcb-gh">'+esc(s.group)+'</div>'; }
+        var meta=s.dur+(s.depNum?" &middot; "+esc(s.dep):" &middot; No deposit");
+        list+='<button class="pqcb-srow'+(S.sid===s.id?" sel":"")+'" data-sid="'+s.id+'">'+
+                '<div class="pqcb-sinfo">'+
+                  '<div class="pqcb-sname">'+esc(s.name)+'</div>'+
+                  (s.note?'<div class="pqcb-snote">'+esc(s.note)+'</div>':"")+
+                  '<div class="pqcb-smeta">'+meta+'</div>'+
+                '</div>'+
+                '<div class="pqcb-sprice"><b>'+esc(s.price)+'</b></div>'+
+                '<span class="pqcb-sarrow">&#8250;</span>'+
+              '</button>';
+      });
+      if(!shown) list='<div class="pqcb-empty">No service matches &ldquo;'+esc(S.q)+'&rdquo;.</div>';
+      elBody.innerHTML=
+        banner+
+        '<input class="pqcb-search" id="pqcb-search" type="search" placeholder="Search cuts, beard, kids&hellip;" value="'+esc(S.q)+'" autocomplete="off">'+
+        list;
+      elFoot.hidden=false;
+      elFoot.innerHTML='<button class="pqcb-link" data-mine>My appointments</button>'+
+        '<span style="font-size:12px;opacity:.5">Step 1 of 5</span>';
+      var si=document.getElementById("pqcb-search");
+      if(si) si.addEventListener("input", function(){ S.q=si.value; var pos=si.selectionStart; rServiceKeepFocus(pos); });
+    }
+    // re-render service list without losing the search caret
+    function rServiceKeepFocus(pos){
+      rService();
+      var si=document.getElementById("pqcb-search");
+      if(si){ si.focus(); try{ si.setSelectionRange(pos,pos); }catch(e){} }
+    }
+
+    // STEP 2 — date (calendar honouring real shop hours)
+    function rDate(){
+      var s=svc(S.sid);
+      if(!S.cal) S.cal=midnight(new Date());
+      var cal=S.cal, y=cal.getFullYear(), mo=cal.getMonth();
+      var first=new Date(y,mo,1), start=first.getDay(), days=new Date(y,mo+1,0).getDate();
+      var today=midnight(new Date());
+      var prevOff = (y<today.getFullYear()||(y===today.getFullYear()&&mo<=today.getMonth()));
+      var monthName=first.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+
+      var cells="";
+      for(var i=0;i<start;i++) cells+='<div class="pqcb-day empty"></div>';
+      for(var d=1;d<=days;d++){
+        var dd=new Date(y,mo,d), off=false, full=false;
+        if(dd<today) off=true;
+        else if(!SCHED[dd.getDay()]) off=true;
+        else if(slotsFor(dd,s.durMin).length===0) { off=true; full=true; }
+        var sel = S.ymd===ymd(dd);
+        cells+='<button class="pqcb-day'+(off?" off":"")+(sel?" sel":"")+'"'+(off?" disabled":"")+
+               ' data-day="'+ymd(dd)+'" title="'+(full?"Fully booked":"")+'">'+d+
+               (off?"":'<i></i>')+'</button>';
+      }
+      elBody.innerHTML=
+        recap(["service"])+
+        '<div class="pqcb-calhead">'+
+          '<button class="pqcb-nav" data-mon="-1"'+(prevOff?" disabled":"")+' aria-label="Previous month">&#8249;</button>'+
+          '<b>'+monthName+'</b>'+
+          '<button class="pqcb-nav" data-mon="1" aria-label="Next month">&#8250;</button>'+
+        '</div>'+
+        '<div class="pqcb-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>'+
+        '<div class="pqcb-grid">'+cells+'</div>'+
+        '<p class="pqcb-sub" style="margin:16px 2px 0">Open days are dotted. Faded days are closed or fully booked.</p>';
+      elFoot.hidden=true;
+    }
+
+    // STEP 3 — time
+    function rTime(){
+      var s=svc(S.sid), date=fromYmd(S.ymd), slots=slotsFor(date,s.durMin);
+      var body=recap(["service","date"]);
+      if(!slots.length){
+        body+='<div class="pqcb-empty">No open times left for this day.<br>Try another day.</div>';
+      }else{
+        var groups=[["Morning",0,720],["Afternoon",720,1020],["Evening",1020,1440]];
+        groups.forEach(function(g){
+          var inG=slots.filter(function(t){ return t>=g[1]&&t<g[2]; });
+          if(!inG.length) return;
+          body+='<div class="pqcb-slotgrp"><b>'+g[0]+'</b><div class="pqcb-slots">';
+          inG.forEach(function(t){
+            body+='<button class="pqcb-slot'+(S.start===t?" sel":"")+'" data-slot="'+t+'">'+fmtMin(t)+'</button>';
+          });
+          body+='</div></div>';
+        });
+      }
+      elBody.innerHTML=body;
+      elFoot.hidden=true;
+    }
+
+    // STEP 4 — details
+    function rDetails(){
+      elBody.innerHTML=
+        recap(["service","date","time"])+
+        '<form id="pqcb-form" novalidate>'+
+          field("name","Full name","text","Jordan Rivera",S.name,"Please tell us your name.")+
+          field("phone","Mobile number","tel","(832) 000-0000",S.phone,"A valid mobile number is needed.")+
+          field("email","Email (optional)","email","you@email.com",S.email,"That email doesn't look right.")+
+          '<div class="pqcb-field"><label for="pqcb-notes">Anything we should know? (optional)</label>'+
+            '<textarea id="pqcb-notes" rows="2" placeholder="Style reference, parking, running late&hellip;">'+esc(S.notes)+'</textarea></div>'+
+          '<button type="submit" class="pqcb-btn wide" style="margin-top:4px">Review booking &#8250;</button>'+
+        '</form>';
+      elFoot.hidden=false;
+      elFoot.innerHTML='<span style="font-size:12px;opacity:.55;line-height:1.5">We only use this to confirm &amp; remind you about this appointment.</span>';
+      var f=document.getElementById("pqcb-form");
+      f.addEventListener("submit",function(e){ e.preventDefault(); submitDetails(); });
+    }
+    function field(key,label,type,ph,val,err){
+      return '<div class="pqcb-field" data-f="'+key+'"><label for="pqcb-'+key+'">'+label+'</label>'+
+        '<input id="pqcb-'+key+'" type="'+type+'" placeholder="'+ph+'" value="'+esc(val)+'"'+
+        (type==="tel"?' inputmode="tel"':"")+' autocomplete="'+(key==="name"?"name":key==="phone"?"tel":key==="email"?"email":"off")+'">'+
+        '<div class="pqcb-err">'+err+'</div></div>';
+    }
+    function submitDetails(){
+      var n=document.getElementById("pqcb-name").value.trim();
+      var p=document.getElementById("pqcb-phone").value.trim();
+      var em=document.getElementById("pqcb-email").value.trim();
+      S.name=n; S.phone=p; S.email=em; S.notes=document.getElementById("pqcb-notes").value.trim();
+      var ok=true;
+      function bad(key,is){ var el=document.querySelector('[data-f="'+key+'"]'); if(el) el.classList.toggle("bad",!!is); if(is) ok=false; }
+      bad("name", n.length<2);
+      bad("phone", (p.replace(/\D/g,"").length<7));
+      bad("email", em!=="" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em));
+      if(ok) go("review"); else toast("Please check the highlighted fields.");
+    }
+
+    // STEP 5 — review
+    function rReview(){
+      var s=svc(S.sid);
+      var depTxt = s.depNum ? "$"+ (s.depNum%1?s.depNum.toFixed(2):s.depNum) : "None";
+      elBody.innerHTML=
+        '<div class="pqcb-receipt">'+
+          rrow("Service", esc(s.name), "service")+
+          rrow("Date", prettyDate(S.ymd), "date")+
+          rrow("Time", fmtMin(S.start)+" &ndash; "+fmtMin(S.start+s.durMin), "time")+
+          rrow("With", "Rese the Barber")+
+          rrow("Name", esc(S.name), "details")+
+          rrow("Mobile", esc(S.phone), "details")+
+          (S.email?rrow("Email", esc(S.email)):"")+
+          (S.notes?rrow("Notes", esc(S.notes), "details"):"")+
+          '<div class="pqcb-rrow big"><span>Total</span><b>'+esc(s.price)+'</b></div>'+
+          '<div class="pqcb-rrow"><span>Deposit to lock it</span><b>'+depTxt+'</b></div>'+
+        '</div>'+
+        '<div class="pqcb-note">'+
+          (s.depNum
+            ? "Tap <b>Confirm</b> to hold this slot. We'll text you to settle the "+depTxt+" deposit &mdash; your time is held for 24 hours until it's in."
+            : "No deposit for this service &mdash; tap <b>Confirm</b> and your slot is held. Please arrive a few minutes early.")+
+        '</div>'+
+        '<button class="pqcb-btn wide" data-confirm>Confirm booking</button>';
+      elFoot.hidden=false;
+      elFoot.innerHTML='<span style="font-size:12px;opacity:.55">Free cancellation up to 24h before.</span>';
+    }
+    function rrow(label,val,editStep){
+      return '<div class="pqcb-rrow"><span>'+label+'</span><b>'+val+
+        (editStep?' <button class="pqcb-chip-edit" data-edit="'+editStep+'" style="background:none;border:0;color:#7c5c0d;cursor:pointer;font:800 10px/1 \'Archivo\';text-transform:uppercase;letter-spacing:.06em;text-decoration:underline;text-underline-offset:2px;margin-left:8px">Edit</button>':"")+
+        '</b></div>';
+    }
+
+    // STEP 6 — confirmed
+    function rDone(){
+      var b=S.confirmed;
+      elBody.innerHTML=
+        '<div class="pqcb-check">&#10003;</div>'+
+        '<div style="text-align:center"><div class="pqcb-ref">'+esc(b.ref)+'</div></div>'+
+        '<p class="pqcb-sub" style="text-align:center;margin:14px auto 18px;max-width:360px">'+
+          esc(b.sname)+' with Rese<br><b style="opacity:.9">'+prettyDate(b.ymd)+' at '+fmtMin(b.start)+'</b></p>'+
+        '<div class="pqcb-note" style="margin-bottom:18px">'+
+          (b.depNum
+            ? "Saved on this phone. Tap <b>Text to confirm</b> so Rese can lock your "+("$"+(b.depNum%1?b.depNum.toFixed(2):b.depNum))+" deposit."
+            : "Saved on this phone. See you soon &mdash; add it to your calendar so it doesn't slip.")+
+        '</div>'+
+        (b.depNum?'<a class="pqcb-btn wide" style="text-decoration:none;margin-bottom:10px" href="'+smsLink(b)+'">Text to confirm deposit</a>':"")+
+        '<button class="pqcb-btn2 wide" data-ics="'+b.ref+'" style="margin-bottom:10px">Add to calendar</button>'+
+        '<a class="pqcb-btn2 wide" style="text-decoration:none;margin-bottom:10px" href="tel:'+SHOP.tel+'">Call the shop</a>';
+      elFoot.hidden=false;
+      elFoot.innerHTML=
+        '<button class="pqcb-link" data-mine>My appointments</button>'+
+        '<button class="pqcb-btn" data-close>Done</button>';
+      elBack.hidden=true;
+    }
+
+    // MY APPOINTMENTS
+    function rMine(){
+      var up=upcoming();
+      var body="";
+      if(!up.length){
+        body='<div class="pqcb-empty">No upcoming appointments.<br>Book your next cut in under a minute.</div>';
+      }else{
+        up.forEach(function(b){
+          var s=svc(b.sid);
+          body+='<div class="pqcb-receipt" style="margin-bottom:12px">'+
+            '<div class="pqcb-rrow big"><span>'+esc(b.sname)+'</span><b>'+esc(b.price)+'</b></div>'+
+            '<div class="pqcb-rrow"><span>'+prettyShort(b.ymd)+'</span><b>'+fmtMin(b.start)+' &ndash; '+fmtMin(b.start+b.durMin)+'</b></div>'+
+            '<div class="pqcb-rrow"><span>Ref</span><b style="letter-spacing:.08em">'+esc(b.ref)+'</b></div>'+
+            '<div style="display:flex;gap:8px;padding:12px 16px">'+
+              '<button class="pqcb-btn2" style="flex:1" data-ics="'+b.ref+'">Add to calendar</button>'+
+              '<button class="pqcb-btn2" style="flex:1;border-color:color-mix(in srgb,#c0392b 40%,transparent);color:#a5321f" data-cancel="'+b.ref+'">Cancel</button>'+
+            '</div>'+
+          '</div>';
+        });
+      }
+      elBody.innerHTML=body;
+      elFoot.hidden=false;
+      elFoot.innerHTML='<span style="font-size:12px;opacity:.5">Stored on this device</span>'+
+        '<button class="pqcb-btn" data-new>Book another</button>';
+    }
+
+    // recap chip strip with edit jumps
+    function recap(which){
+      var s=svc(S.sid), h='<div class="pqcb-recap">';
+      if(which.indexOf("service")>=0 && s)
+        h+='<span class="pqcb-chip"><s>&#9986;</s>'+esc(s.name)+' &middot; '+esc(s.price)+'<button data-edit="service">change</button></span>';
+      if(which.indexOf("date")>=0 && S.ymd)
+        h+='<span class="pqcb-chip"><s>&#128197;</s>'+prettyShort(S.ymd)+'<button data-edit="date">change</button></span>';
+      if(which.indexOf("time")>=0 && S.start!=null)
+        h+='<span class="pqcb-chip"><s>&#128336;</s>'+fmtMin(S.start)+'<button data-edit="time">change</button></span>';
+      return h+'</div>';
+    }
+
+    // ---- confirm / persist ----
+    function makeRef(){
+      var t=Date.now().toString(36).toUpperCase().slice(-4);
+      var r=Math.floor(Math.random()*1296).toString(36).toUpperCase();
+      while(r.length<2) r="0"+r;
+      return "PQC-"+t+r;
+    }
+    function confirmBooking(){
+      var s=svc(S.sid);
+      // guard: re-check the slot is still free on this device
+      var open=slotsFor(fromYmd(S.ymd),s.durMin);
+      if(open.indexOf(S.start)<0){ toast("That time was just taken — please pick another."); go("time"); return; }
+      var b={ ref:makeRef(), sid:s.id, sname:s.name, group:s.group, price:s.price,
+              depNum:s.depNum, ymd:S.ymd, start:S.start, durMin:s.durMin,
+              name:S.name, phone:S.phone, email:S.email, notes:S.notes,
+              created:Date.now(), status:"booked" };
+      var all=load(); all.push(b); store(all);
+      S.confirmed=b;
+      go("done");
+    }
+
+    // ---- calendar (.ics) ----
+    function icsStamp(y,startMin){
+      var p=y.split("-"); var hh=pad(Math.floor(startMin/60)), mm=pad(startMin%60);
+      return p[0]+p[1]+p[2]+"T"+hh+mm+"00";
+    }
+    function downloadICS(b){
+      var s=svc(b.sid);
+      var dtStart=icsStamp(b.ymd,b.start), dtEnd=icsStamp(b.ymd,b.start+b.durMin);
+      var desc="Booking "+b.ref+" with Rese the Barber. "+(b.depNum?("Deposit due to confirm."):"")+" Questions: "+SHOP.telH;
+      var ics=[
+        "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Premium Quality Cuts//Booking//EN","CALSCALE:GREGORIAN",
+        "BEGIN:VEVENT","UID:"+b.ref+"@premiumqualitycuts",
+        "DTSTART:"+dtStart,"DTEND:"+dtEnd,
+        "SUMMARY:"+(b.sname||"Barber appointment")+" — Premium Quality Cuts",
+        "LOCATION:"+SHOP.addr.replace(/,/g,"\\,"),
+        "DESCRIPTION:"+desc.replace(/,/g,"\\,"),
+        "BEGIN:VALARM","TRIGGER:-PT2H","ACTION:DISPLAY","DESCRIPTION:Barber appointment soon","END:VALARM",
+        "END:VEVENT","END:VCALENDAR"
+      ].join("\r\n");
+      try{
+        var blob=new Blob([ics],{type:"text/calendar;charset=utf-8"});
+        var url=URL.createObjectURL(blob);
+        var a=document.createElement("a");
+        a.href=url; a.download=(b.ref||"appointment")+".ics";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); },1500);
+        toast("Calendar file downloaded.");
+      }catch(e){ toast("Couldn't create the calendar file."); }
+    }
+    function smsLink(b){
+      var body="Hi Rese, confirming my booking "+b.ref+": "+b.sname+" on "+prettyDate(b.ymd)+" at "+fmtMin(b.start)+
+               ". Name: "+b.name+", phone "+b.phone+"."+(b.depNum?(" Ready to send the deposit."):"");
+      return "sms:"+SHOP.tel+"?&body="+encodeURIComponent(body);
+    }
+
+    // ---- events ----
+    elClose.addEventListener("click", close);
+    elBack.addEventListener("click", back);
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !root.hidden) close(); });
+
+    root.addEventListener("click", function(e){
+      var t=e.target;
+      if(t.closest("[data-close]")){ close(); return; }
+      var el;
+      if((el=t.closest("[data-sid]"))){ S.sid=el.getAttribute("data-sid"); S.ymd=null; S.start=null; if(!S.cal) S.cal=midnight(new Date()); go("date"); return; }
+      if((el=t.closest("[data-day]"))){ if(el.classList.contains("off")) return; S.ymd=el.getAttribute("data-day"); S.start=null; go("time"); return; }
+      if((el=t.closest("[data-slot]"))){ S.start=parseInt(el.getAttribute("data-slot"),10); go("details"); return; }
+      if((el=t.closest("[data-mon]"))){ var dir=parseInt(el.getAttribute("data-mon"),10); S.cal=new Date(S.cal.getFullYear(),S.cal.getMonth()+dir,1); rDate(); return; }
+      if((el=t.closest("[data-edit]"))){ go(el.getAttribute("data-edit")); return; }
+      if(t.closest("[data-confirm]")){ confirmBooking(); return; }
+      if((el=t.closest("[data-ics]"))){ var b=findRef(el.getAttribute("data-ics")); if(b) downloadICS(b); return; }
+      if((el=t.closest("[data-cancel]"))){ cancelRef(el.getAttribute("data-cancel")); return; }
+      if(t.closest("[data-mine]")){ go("mine"); return; }
+      if(t.closest("[data-new]")){ S.sid=null;S.ymd=null;S.start=null; go("service"); return; }
+    });
+
+    function findRef(ref){ var a=load(); for(var i=0;i<a.length;i++) if(a[i].ref===ref) return a[i]; return null; }
+    function cancelRef(ref){
+      var a=load();
+      for(var i=0;i<a.length;i++) if(a[i].ref===ref) a[i].status="cancelled";
+      store(a); toast("Appointment cancelled."); rMine();
+    }
+
+    // ---- page hooks: any [data-book] / #book-now anchor opens the engine ----
+    document.addEventListener("click", function(e){
+      var a=e.target.closest && e.target.closest('[data-book], a[href="#book-now"], a[href$="#book-now"]');
+      if(a){ e.preventDefault(); open(); }
+    });
+    // deep-link support: /premiumqualitycuts.html#book-now
+    if(location.hash==="#book-now"){ try{ open(); }catch(e){} }
+
+    // tiny global so other page code (or a console) can trigger it
+    window.PQCBook = { open:open, close:close };
+  })();
+  </script>
+
+
 </body>
 </html>
