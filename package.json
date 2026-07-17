@@ -1,0 +1,9 @@
+{
+  "name": "weblayouts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static marketing sites + a small booking backend (Google Calendar + email) for Premium Quality Cuts.",
+  "dependencies": {
+    "googleapis": "^140.0.1"
+  }
+}

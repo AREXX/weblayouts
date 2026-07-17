@@ -978,6 +978,14 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
 
     var SHOP  = { name:"Premium Quality Cuts", tel:"+18327144153", telH:"(832) 714-4153",
                   addr:"6850 Hwy 6 Ste 600, Missouri City, TX 77459" };
+    // Backend (Vercel functions). Same-origin, so relative paths. If the page
+    // is opened without a server, remote calls are skipped and booking falls
+    // back to the local-only flow.
+    var BOOK_API  = "/api/book";
+    var AVAIL_API = "/api/availability";
+    var SERVER_BUSY = {};   // ymd -> [{start,end}] busy blocks from the calendar
+    var AVAIL = {};         // ymd -> "loading" | "done"
+    function hasBackend(){ return /^https?:$/.test(location.protocol); }
     var LSK = "pqc.bookings.v1";
     var STEP_BUFFER = 10;   // minutes of breathing room between appointments
     var TODAY_LEAD  = 90;   // no same-day slot within 90 min from now
@@ -1018,8 +1026,22 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     function prettyShort(s){ return fromYmd(s).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}); }
 
     function busyFor(y){
-      return active().filter(function(b){ return b.ymd===y; })
+      var local = active().filter(function(b){ return b.ymd===y; })
         .map(function(b){ return { start:b.start, end:b.start+b.durMin }; });
+      var server = SERVER_BUSY[y] || [];
+      return local.concat(server);
+    }
+    // Pull the calendar's busy blocks for a day so slots taken by OTHER
+    // customers grey out too. Re-renders the time step when the answer lands.
+    function loadAvail(y){
+      if(AVAIL[y]) return;                       // already loading or done
+      if(!hasBackend()){ AVAIL[y]="done"; return; }
+      AVAIL[y]="loading";
+      fetch(AVAIL_API+"?date="+encodeURIComponent(y))
+        .then(function(r){ return r.ok ? r.json() : {busy:[]}; })
+        .then(function(j){ SERVER_BUSY[y]=(j&&j.busy)||[]; })
+        .catch(function(){ SERVER_BUSY[y]=[]; })
+        .then(function(){ AVAIL[y]="done"; if(S.step==="time" && S.ymd===y) rTime(); });
     }
     function slotsFor(dateObj, durMin){
       var sc = SCHED[dateObj.getDay()]; if(!sc) return [];
@@ -1183,8 +1205,13 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
 
     // STEP 3 — time
     function rTime(){
+      loadAvail(S.ymd);   // fetch calendar busy-times for this day (async)
       var s=svc(S.sid), date=fromYmd(S.ymd), slots=slotsFor(date,s.durMin);
+      var loading = AVAIL[S.ymd]==="loading";
       var body=recap(["service","date"]);
+      if(loading){
+        body+='<p class="pqcb-sub" style="margin:0 2px 12px">Checking live availability&hellip;</p>';
+      }
       if(!slots.length){
         body+='<div class="pqcb-empty">No open times left for this day.<br>Try another day.</div>';
       }else{
@@ -1280,9 +1307,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
         '<p class="pqcb-sub" style="text-align:center;margin:14px auto 18px;max-width:360px">'+
           esc(b.sname)+' with Rese<br><b style="opacity:.9">'+prettyDate(b.ymd)+' at '+fmtMin(b.start)+'</b></p>'+
         '<div class="pqcb-note" style="margin-bottom:18px">'+
-          (b.depNum
-            ? "Saved on this phone. Tap <b>Text to confirm</b> so Rese can lock your "+("$"+(b.depNum%1?b.depNum.toFixed(2):b.depNum))+" deposit."
-            : "Saved on this phone. See you soon &mdash; add it to your calendar so it doesn't slip.")+
+          (b.sent
+            ? "Your slot is reserved and Rese has been notified. Add it to your calendar so it doesn&rsquo;t slip."
+            : b.depNum
+              ? "Saved on this phone. Tap <b>Text to confirm</b> so Rese can lock your "+("$"+(b.depNum%1?b.depNum.toFixed(2):b.depNum))+" deposit."
+              : "Saved on this phone &mdash; please call the shop to confirm. Add it to your calendar so it doesn&rsquo;t slip.")+
         '</div>'+
         (b.depNum?'<a class="pqcb-btn wide" style="text-decoration:none;margin-bottom:10px" href="'+smsLink(b)+'">Text to confirm deposit</a>':"")+
         '<button class="pqcb-btn2 wide" data-ics="'+b.ref+'" style="margin-bottom:10px">Add to calendar</button>'+
@@ -1347,10 +1376,37 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       var b={ ref:makeRef(), sid:s.id, sname:s.name, group:s.group, price:s.price,
               depNum:s.depNum, ymd:S.ymd, start:S.start, durMin:s.durMin,
               name:S.name, phone:S.phone, email:S.email, notes:S.notes,
-              created:Date.now(), status:"booked" };
-      var all=load(); all.push(b); store(all);
-      S.confirmed=b;
-      go("done");
+              created:Date.now(), status:"booked", sent:false };
+      var btn=elBody.querySelector("[data-confirm]");
+      if(btn){ btn.disabled=true; btn.textContent="Reserving…"; }
+      reserveRemote(b, function(res){
+        if(res && res.taken){
+          // Someone grabbed it first — refresh availability and send them back.
+          SERVER_BUSY[b.ymd]=undefined; AVAIL[b.ymd]=undefined;
+          if(btn){ btn.disabled=false; btn.textContent="Confirm booking"; }
+          toast("That time was just taken — please pick another."); go("time"); return;
+        }
+        b.sent = !!(res && res.ok);
+        var all=load(); all.push(b); store(all);
+        S.confirmed=b;
+        go("done");
+      });
+    }
+    // Reserve the slot on the backend (Google Calendar + email to the shop).
+    // Degrades gracefully: with no backend, or on a network error, we still
+    // confirm locally so the customer is never stuck — b.sent stays false.
+    function reserveRemote(b, done){
+      if(!hasBackend()){ done({offline:true}); return; }
+      var payload={ ref:b.ref, service:b.sname, group:b.group, price:b.price,
+                    ymd:b.ymd, start:b.start, durMin:b.durMin,
+                    name:b.name, phone:b.phone, email:b.email, notes:b.notes };
+      fetch(BOOK_API,{ method:"POST", headers:{"Content-Type":"application/json"},
+                       body:JSON.stringify(payload) })
+        .then(function(r){
+          if(r.status===409){ done({taken:true}); return; }
+          return r.json().then(function(j){ done(j||{}); }, function(){ done({}); });
+        })
+        .catch(function(){ done({offline:true}); });
     }
 
     // ---- calendar (.ics) ----
