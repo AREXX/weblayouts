@@ -5,6 +5,7 @@
 import { handler, sendJson, readBody, normPhone } from "./_util.js";
 import { svc, computeSlots, isValidYmd, STEP_BUFFER } from "./_shop.js";
 import { db, rowToBooking } from "./_db.js";
+import { notify } from "./_notify.js";
 
 export default handler("POST", async (req, res) => {
   const b = await readBody(req);
@@ -48,5 +49,7 @@ export default handler("POST", async (req, res) => {
     [ref, b.ymd, start, durMin, Date.now(), STEP_BUFFER]
   );
   if (!rows.length) return sendJson(res, 409, { ok: false, error: "That time was just taken — please pick another." });
-  sendJson(res, 200, { ok: true, booking: rowToBooking(rows[0]) });
+  const booking = rowToBooking(rows[0]);
+  await notify("reschedule", booking);
+  sendJson(res, 200, { ok: true, booking });
 });

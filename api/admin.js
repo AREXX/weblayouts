@@ -5,6 +5,7 @@
 import { handler, sendJson, readBody, query, adminOk } from "./_util.js";
 import { shopNow } from "./_shop.js";
 import { db, rowToBooking } from "./_db.js";
+import { notify } from "./_notify.js";
 
 const ACTION_STATUS = { confirm: "confirmed", cancel: "cancelled", noshow: "noshow", book: "booked" };
 
@@ -35,5 +36,9 @@ export default handler(["GET", "POST"], async (req, res) => {
     [ref, status, Date.now()]
   );
   if (!rows.length) return sendJson(res, 404, { ok: false, error: "Appointment not found." });
-  sendJson(res, 200, { ok: true, booking: rowToBooking(rows[0]) });
+  const booking = rowToBooking(rows[0]);
+  // let the customer know when the barber confirms or cancels (no shop self-email)
+  if (b.action === "confirm") await notify("confirmed", booking, { toShop: false });
+  else if (b.action === "cancel") await notify("cancel", booking, { toShop: false });
+  sendJson(res, 200, { ok: true, booking });
 });

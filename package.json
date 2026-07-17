@@ -6,7 +6,8 @@
   "description": "Static landing pages + serverless booking API for Premium Quality Cuts",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
-    "test:api": "node scripts/test-api.mjs"
+    "test:api": "node scripts/test-api.mjs",
+    "test:notify": "node scripts/test-notify.mjs && node scripts/test-notify-send.mjs"
   },
   "engines": {
     "node": ">=18"

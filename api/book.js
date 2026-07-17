@@ -4,6 +4,7 @@
 import { handler, sendJson, readBody, makeRef, validPhone, validEmail } from "./_util.js";
 import { svc, computeSlots, isValidYmd, STEP_BUFFER } from "./_shop.js";
 import { db, rowToBooking } from "./_db.js";
+import { notify } from "./_notify.js";
 
 export default handler("POST", async (req, res) => {
   const b = await readBody(req);
@@ -53,7 +54,9 @@ export default handler("POST", async (req, res) => {
         // lost the race — slot taken between the check and the insert
         return sendJson(res, 409, { ok: false, error: "That time was just taken — please pick another." });
       }
-      return sendJson(res, 200, { ok: true, booking: rowToBooking(rows[0]) });
+      const booking = rowToBooking(rows[0]);
+      await notify("booked", booking); // best-effort; never throws
+      return sendJson(res, 200, { ok: true, booking });
     } catch (e) {
       if (String(e && e.code) === "23505") continue; // ref collision → new ref
       throw e;

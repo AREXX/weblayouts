@@ -55,6 +55,24 @@ Redeploy so the variables take effect. That's it:
 > non-commercial use per Vercel's terms; a paying business may eventually need
 > Vercel **Pro**. Neon's free database tier has no such restriction.
 
+### 3. Email notifications (optional, free)
+
+When a booking is made / moved / cancelled, the shop and the customer get an
+email. This uses [Resend](https://resend.com) (free tier ~3k emails/month).
+Without these variables the API simply skips email — everything else still works.
+
+| Name             | Value                                              | Notes |
+|------------------|----------------------------------------------------|-------|
+| `RESEND_API_KEY` | *(from resend.com)*                                | Turns email on. |
+| `SHOP_EMAIL`     | the barber's inbox, e.g. `rese@premiumqualitycuts.com` | Where shop notifications go. |
+| `MAIL_FROM`      | `Premium Quality Cuts <booking@yourdomain.com>`    | Must be a Resend-verified sender. Until you verify a domain you can use `onboarding@resend.dev`, which only delivers to your own Resend account email (fine for testing). |
+
+Which emails fire:
+
+- **Customer books / reschedules / cancels** → email to the shop **and** to the
+  customer (customer email only if they entered one — it's an optional field).
+- **Barber confirms or cancels from `admin.html`** → email to the customer.
+
 ## Run it locally (no accounts, no database)
 
 With no `DATABASE_URL`, the API uses **PGlite** (an in-process Postgres), so the
@@ -72,6 +90,7 @@ Open <http://localhost:3000/premiumqualitycuts.html> and
 
 ```bash
 npm run test:api                       # API logic against in-process Postgres
+npm run test:notify                    # email composition + that /book fires Resend
 
 # browser end-to-end (book / cross-device / reschedule / admin):
 PORT=3100 ADMIN_PIN=4242 node scripts/dev-server.mjs &   # start server
@@ -94,6 +113,7 @@ update both** so availability and pricing stay consistent. Service ids
 - **Cancel/reschedule auth:** a customer must supply the phone number on the
   booking, so a guessed reference alone can't touch someone else's appointment.
   The admin PIN bypasses this.
-- **Notifications:** the page still offers the pre-filled SMS + calendar file.
-  Automatic email/SMS on booking would need a provider (e.g. Twilio/Resend) and
-  is not wired up.
+- **Notifications:** automatic **email** to the shop + customer is wired up via
+  Resend (see step 3 — enabled by setting the env vars). The page also still
+  offers the pre-filled SMS + calendar file. Automatic **SMS** would need a paid
+  provider (e.g. Twilio) and is not wired up.

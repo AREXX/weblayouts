@@ -3,6 +3,7 @@
 // Requires the booking's phone to match.
 import { handler, sendJson, readBody, normPhone } from "./_util.js";
 import { db, rowToBooking } from "./_db.js";
+import { notify } from "./_notify.js";
 
 export default handler("POST", async (req, res) => {
   const b = await readBody(req);
@@ -19,5 +20,7 @@ export default handler("POST", async (req, res) => {
     `UPDATE bookings SET status = 'cancelled', updated = $2 WHERE ref = $1 RETURNING *`,
     [ref, Date.now()]
   );
-  sendJson(res, 200, { ok: true, booking: rowToBooking(rows[0]) });
+  const booking = rowToBooking(rows[0]);
+  await notify("cancel", booking);
+  sendJson(res, 200, { ok: true, booking });
 });
