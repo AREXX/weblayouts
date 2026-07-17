@@ -1,0 +1,23 @@
+{
+  "name": "weblayouts-booking",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Static landing pages + serverless booking API for Premium Quality Cuts",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "test:api": "node scripts/test-api.mjs",
+    "test:notify": "node scripts/test-notify.mjs && node scripts/test-notify-send.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "ws": "^8.21.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.17",
+    "playwright-core": "^1.49.0"
+  }
+}

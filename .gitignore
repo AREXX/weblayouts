@@ -1,0 +1,7 @@
+node_modules/
+.vercel/
+*.log
+.DS_Store
+# local PGlite data (dev only)
+pgdata/
+.pglite/
