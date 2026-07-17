@@ -979,8 +979,37 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     var SHOP  = { name:"Premium Quality Cuts", tel:"+18327144153", telH:"(832) 714-4153",
                   addr:"6850 Hwy 6 Ste 600, Missouri City, TX 77459" };
     var LSK = "pqc.bookings.v1";
+    var PHK = "pqc.phone.v1";
     var STEP_BUFFER = 10;   // minutes of breathing room between appointments
     var TODAY_LEAD  = 90;   // no same-day slot within 90 min from now
+
+    // ---- backend API (Vercel functions) with graceful offline fallback ----
+    // When the API is reachable, availability + bookings are server-authoritative
+    // and shared across devices. When it isn't, the engine falls back to the
+    // original device-local localStorage flow so the page still works offline.
+    var API_BASE = (window.PQC_API_BASE || "") + "/api";
+    var ONLINE = false;     // flipped on by a health check when the modal opens
+    function apiGET(path){
+      return fetch(API_BASE+path, { headers:{ "Accept":"application/json" } }).then(function(r){
+        return r.json().then(function(j){
+          if(!r.ok || !j.ok){ var e=new Error((j&&j.error)||("HTTP "+r.status)); e.status=r.status; throw e; }
+          return j;
+        });
+      });
+    }
+    function apiPOST(path, body){
+      return fetch(API_BASE+path, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(body) }).then(function(r){
+        return r.json().then(function(j){
+          if(!r.ok || !j.ok){ var e=new Error((j&&j.error)||("HTTP "+r.status)); e.status=r.status; throw e; }
+          return j;
+        });
+      });
+    }
+    function checkOnline(){
+      return apiGET("/services").then(function(){ ONLINE=true; }).catch(function(){ ONLINE=false; });
+    }
+    function getPhone(){ try{ return localStorage.getItem(PHK)||""; }catch(e){ return ""; } }
+    function rememberPhone(p){ try{ if(p) localStorage.setItem(PHK, p); }catch(e){} }
 
     // ---- helpers ----
     function money(s){ var m=String(s||"").match(/([\d]+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; }
@@ -1007,6 +1036,28 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       var t=ymd(new Date());
       return active().filter(function(b){ return b.ymd>=t; })
         .sort(function(a,b){ return a.ymd===b.ymd ? a.start-b.start : (a.ymd<b.ymd?-1:1); });
+    }
+    // upsert a server booking into the local mirror (so offline view + My
+    // appointments stay in sync); mark it as server-originated for reconciliation
+    function upsertLocal(b){
+      if(!b||!b.ref) return;
+      b.origin="server";
+      var a=load(), hit=false;
+      for(var i=0;i<a.length;i++){ if(a[i].ref===b.ref){ a[i]=b; hit=true; break; } }
+      if(!hit) a.push(b);
+      store(a);
+    }
+    // reconcile the local mirror with the server's authoritative list for a phone:
+    // upsert everything the server returned, and mark previously-synced bookings
+    // the server no longer lists (e.g. the barber cancelled one) as cancelled
+    function mergeServer(list, phone){
+      var refs={}; (list||[]).forEach(function(b){ upsertLocal(b); refs[b.ref]=1; });
+      var np=String(phone||"").replace(/\D/g,""), t=ymd(new Date()), a=load(), changed=false;
+      a.forEach(function(b){
+        if(b.origin==="server" && b.status!=="cancelled" && b.ymd>=t &&
+           String(b.phone||"").replace(/\D/g,"")===np && !refs[b.ref]){ b.status="cancelled"; changed=true; }
+      });
+      if(changed) store(a);
     }
 
     // ---- date utils (device-local) ----
@@ -1041,7 +1092,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     // ---- state ----
     var S = { step:"service", sid:null, ymd:null, start:null, cal:null,
               name:"", phone:"", email:"", notes:"", q:"", ref:null,
-              reRef:null, reOld:null, doneKind:null };
+              reRef:null, reOld:null, doneKind:null, _slots:null, _slotsKey:null };
     var STEPS = ["service","date","time","details","review"];
 
     // ---- DOM ----
@@ -1063,12 +1114,14 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
 
     function open(sid){
       lastFocus=document.activeElement;
-      S.step="service"; S.q=""; S.reRef=null; S.reOld=null; S.doneKind=null;
+      S.step="service"; S.q=""; S.reRef=null; S.reOld=null; S.doneKind=null; S._slots=null; S._slotsKey=null;
       if(sid){ S.sid=sid; S.step="date"; if(!S.cal) S.cal=midnight(new Date()); }
       root.hidden=false;
       document.documentElement.style.overflow="hidden";
       document.body.style.overflow="hidden";
       render();
+      // health-check the backend; if reachable, refresh any open list with live data
+      checkOnline().then(function(){ if(!root.hidden && S.step==="mine") rMine(); });
     }
     function close(){
       root.hidden=true;
@@ -1192,9 +1245,22 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       elFoot.hidden=true;
     }
 
-    // STEP 3 — time
+    // STEP 3 — time. When online, availability comes from the server (shared
+    // across devices); otherwise it falls back to the local slot calculation.
     function rTime(){
-      var s=svc(S.sid), date=fromYmd(S.ymd), slots=slotsFor(date,s.durMin);
+      var s=svc(S.sid), key=S.ymd+"|"+S.sid;
+      if(ONLINE){
+        if(S._slotsKey===key && S._slots){ renderSlots(S._slots); return; }
+        elBody.innerHTML=recap(["service","date"])+'<div class="pqcb-empty">Checking live availability&hellip;</div>';
+        elFoot.hidden=true;
+        apiGET("/slots?date="+encodeURIComponent(S.ymd)+"&sid="+encodeURIComponent(S.sid))
+          .then(function(j){ S._slots=j.slots; S._slotsKey=key; if(S.step==="time") renderSlots(j.slots); })
+          .catch(function(){ ONLINE=false; if(S.step==="time") renderSlots(slotsFor(fromYmd(S.ymd),s.durMin)); });
+        return;
+      }
+      renderSlots(slotsFor(fromYmd(S.ymd),s.durMin));
+    }
+    function renderSlots(slots){
       var body=recap(["service","date"]);
       if(!slots.length){
         body+='<div class="pqcb-empty">No open times left for this day.<br>Try another day.</div>';
@@ -1346,19 +1412,52 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       elBack.hidden=true;
     }
 
-    // MY APPOINTMENTS
+    // MY APPOINTMENTS — renders from the local mirror, then (when online)
+    // refreshes from the server for the known phone so it works across devices.
     function rMine(){
-      var up=upcoming();
+      renderMine(upcoming());
+      if(ONLINE){
+        var lp=upcoming()[0];
+        var ph=getPhone()||(lp&&lp.phone)||"";
+        if(ph){
+          apiGET("/mine?phone="+encodeURIComponent(ph)).then(function(j){
+            rememberPhone(ph); mergeServer(j.bookings, ph);
+            if(S.step==="mine") renderMine(upcoming());
+          }).catch(function(){});
+        }
+      }
+    }
+    function findByPhoneBox(){
+      return '<div class="pqcb-field" style="margin-top:16px">'+
+        '<label for="pqcb-findphone">Booked on another device?</label>'+
+        '<div style="display:flex;gap:8px">'+
+          '<input id="pqcb-findphone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Your mobile number" style="flex:1;padding:13px 15px;border:1.5px solid color-mix(in srgb,#201e1d 15%,transparent);border-radius:10px;font:600 15px/1.4 \'Archivo\',sans-serif;background:#fff;color:#201e1d">'+
+          '<button class="pqcb-btn" data-find type="button">Find</button>'+
+        '</div></div>';
+    }
+    function findByPhone(){
+      var el=document.getElementById("pqcb-findphone"); if(!el) return;
+      var ph=el.value.trim();
+      if(ph.replace(/\D/g,"").length<7){ toast("Enter a valid mobile number."); return; }
+      rememberPhone(ph);
+      apiGET("/mine?phone="+encodeURIComponent(ph)).then(function(j){
+        mergeServer(j.bookings, ph);
+        var up=upcoming();
+        if(!up.length) toast("No upcoming appointments found for that number.");
+        if(S.step==="mine") renderMine(up);
+      }).catch(function(){ toast("Couldn't reach the shop — try again."); });
+    }
+    function renderMine(up){
       var body="";
       if(!up.length){
         body='<div class="pqcb-empty">No upcoming appointments.<br>Book your next cut in under a minute.</div>';
       }else{
         up.forEach(function(b){
-          var s=svc(b.sid);
           body+='<div class="pqcb-receipt" style="margin-bottom:12px">'+
             '<div class="pqcb-rrow big"><span>'+esc(b.sname)+'</span><b>'+esc(b.price)+'</b></div>'+
             '<div class="pqcb-rrow"><span>'+prettyShort(b.ymd)+'</span><b>'+fmtMin(b.start)+' &ndash; '+fmtMin(b.start+b.durMin)+'</b></div>'+
-            '<div class="pqcb-rrow"><span>Ref</span><b style="letter-spacing:.08em">'+esc(b.ref)+'</b></div>'+
+            '<div class="pqcb-rrow"><span>Ref</span><b style="letter-spacing:.08em">'+esc(b.ref)+
+              (b.status==="confirmed"?' &middot; <span style="color:#2f7d32">confirmed</span>':"")+'</b></div>'+
             '<div style="display:flex;gap:8px;padding:12px 16px 6px">'+
               '<button class="pqcb-btn2" style="flex:1" data-resched="'+b.ref+'">Reschedule</button>'+
               '<button class="pqcb-btn2" style="flex:1;border-color:color-mix(in srgb,#c0392b 40%,transparent);color:#a5321f" data-cancel="'+b.ref+'">Cancel</button>'+
@@ -1369,9 +1468,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
           '</div>';
         });
       }
+      if(ONLINE && !getPhone()) body+=findByPhoneBox();
       elBody.innerHTML=body;
       elFoot.hidden=false;
-      elFoot.innerHTML='<span style="font-size:12px;opacity:.5;line-height:1.4">Saved on this device &middot; text the shop to confirm changes</span>'+
+      elFoot.innerHTML='<span style="font-size:12px;opacity:.5;line-height:1.4">'+
+        (ONLINE?"Synced with the shop":"Saved on this device &middot; text the shop to confirm changes")+'</span>'+
         '<button class="pqcb-btn" data-new>Book another</button>';
     }
 
@@ -1395,7 +1496,38 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       while(r.length<2) r="0"+r;
       return "PQC-"+t+r;
     }
+    function setConfirmBusy(on){
+      var btn=elBody.querySelector("[data-confirm]");
+      if(!btn) return;
+      btn.disabled=!!on;
+      if(on){ btn.setAttribute("data-label", btn.textContent); btn.textContent=(S.reRef?"Moving…":"Booking…"); }
+      else if(btn.getAttribute("data-label")){ btn.textContent=btn.getAttribute("data-label"); }
+    }
+    // dispatch: server when online (authoritative + cross-device), else local
     function confirmBooking(){
+      if(ONLINE) return S.reRef ? rescheduleOnline() : bookOnline();
+      confirmLocal();
+    }
+    function bookOnline(){
+      var s=svc(S.sid);
+      setConfirmBusy(true);
+      apiPOST("/book",{ sid:s.id, ymd:S.ymd, start:S.start, name:S.name, phone:S.phone, email:S.email, notes:S.notes })
+        .then(function(j){ rememberPhone(S.phone); upsertLocal(j.booking); S.confirmed=j.booking; S.doneKind="booked"; S._slots=null; go("done"); })
+        .catch(function(e){ setConfirmBusy(false);
+          if(e.status===409){ toast(e.message||"That time was just taken — pick another."); S._slots=null; go("time"); }
+          else if(e.status===400){ toast(e.message||"Please check your details."); }
+          else { ONLINE=false; confirmLocal(); } });
+    }
+    function rescheduleOnline(){
+      setConfirmBusy(true);
+      apiPOST("/reschedule",{ ref:S.reRef, phone:S.phone||getPhone(), ymd:S.ymd, start:S.start })
+        .then(function(j){ upsertLocal(j.booking); S.confirmed=j.booking; S.doneKind="reschedule"; S.reRef=null; S.reOld=null; S._slots=null; go("done"); })
+        .catch(function(e){ setConfirmBusy(false);
+          if(e.status===409){ toast(e.message||"That time was just taken — pick another."); S._slots=null; go("time"); }
+          else if(e.status===403){ toast("That number doesn't match this booking."); }
+          else { ONLINE=false; confirmLocal(); } });
+    }
+    function confirmLocal(){
       var s=svc(S.sid);
       // guard: re-check the slot is still free on this device
       var open=slotsFor(fromYmd(S.ymd),s.durMin);
@@ -1477,8 +1609,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       var t=e.target;
       if(t.closest("[data-close]")){ close(); return; }
       var el;
-      if((el=t.closest("[data-sid]"))){ S.sid=el.getAttribute("data-sid"); S.ymd=null; S.start=null; if(!S.cal) S.cal=midnight(new Date()); go("date"); return; }
-      if((el=t.closest("[data-day]"))){ if(el.classList.contains("off")) return; S.ymd=el.getAttribute("data-day"); S.start=null; go("time"); return; }
+      if((el=t.closest("[data-sid]"))){ S.sid=el.getAttribute("data-sid"); S.ymd=null; S.start=null; S._slots=null; if(!S.cal) S.cal=midnight(new Date()); go("date"); return; }
+      if((el=t.closest("[data-day]"))){ if(el.classList.contains("off")) return; S.ymd=el.getAttribute("data-day"); S.start=null; S._slots=null; go("time"); return; }
       if((el=t.closest("[data-slot]"))){ S.start=parseInt(el.getAttribute("data-slot"),10); go(S.reRef?"review":"details"); return; }
       if((el=t.closest("[data-mon]"))){ var dir=parseInt(el.getAttribute("data-mon"),10); S.cal=new Date(S.cal.getFullYear(),S.cal.getMonth()+dir,1); rDate(); return; }
       if((el=t.closest("[data-edit]"))){ go(el.getAttribute("data-edit")); return; }
@@ -1486,8 +1618,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       if((el=t.closest("[data-ics]"))){ var b=findRef(el.getAttribute("data-ics")); if(b) downloadICS(b); return; }
       if((el=t.closest("[data-resched]"))){ startReschedule(el.getAttribute("data-resched")); return; }
       if((el=t.closest("[data-cancel]"))){ cancelRef(el.getAttribute("data-cancel")); return; }
+      if(t.closest("[data-find]")){ findByPhone(); return; }
       if(t.closest("[data-mine]")){ S.reRef=null; S.reOld=null; go("mine"); return; }
-      if(t.closest("[data-new]")){ S.sid=null;S.ymd=null;S.start=null;S.reRef=null;S.reOld=null;S.doneKind=null; go("service"); return; }
+      if(t.closest("[data-new]")){ S.sid=null;S.ymd=null;S.start=null;S.reRef=null;S.reOld=null;S.doneKind=null;S._slots=null; go("service"); return; }
     });
 
     function findRef(ref){ var a=load(); for(var i=0;i<a.length;i++) if(a[i].ref===ref) return a[i]; return null; }
@@ -1502,14 +1635,26 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       go("date");
     }
 
-    function cancelRef(ref){
-      var b=findRef(ref); if(!b) return;
-      if(!window.confirm("Cancel your "+b.sname+" on "+prettyShort(b.ymd)+" at "+fmtMin(b.start)+"?")) return;
+    function cancelLocal(ref, b){
       var a=load();
       for(var i=0;i<a.length;i++) if(a[i].ref===ref){ a[i].status="cancelled"; a[i].cancelled=Date.now(); }
       store(a);
       S.confirmed=b; S.doneKind="cancel";
       go("done");
+    }
+    function cancelRef(ref){
+      var b=findRef(ref); if(!b) return;
+      if(!window.confirm("Cancel your "+b.sname+" on "+prettyShort(b.ymd)+" at "+fmtMin(b.start)+"?")) return;
+      if(ONLINE){
+        apiPOST("/cancel",{ ref:ref, phone:b.phone||getPhone() })
+          .then(function(){ cancelLocal(ref, b); })
+          .catch(function(e){
+            if(e.status===403){ toast("That number doesn't match this booking."); }
+            else { cancelLocal(ref, b); } // offline / server hiccup: reflect locally
+          });
+        return;
+      }
+      cancelLocal(ref, b);
     }
 
     // ---- page hooks: any [data-book] / #book-now anchor opens the engine ----
