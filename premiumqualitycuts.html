@@ -1018,7 +1018,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     function prettyShort(s){ return fromYmd(s).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}); }
 
     function busyFor(y){
-      return active().filter(function(b){ return b.ymd===y; })
+      // when rescheduling, the appointment being moved must not block itself
+      return active().filter(function(b){ return b.ymd===y && b.ref!==S.reRef; })
         .map(function(b){ return { start:b.start, end:b.start+b.durMin }; });
     }
     function slotsFor(dateObj, durMin){
@@ -1039,7 +1040,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
 
     // ---- state ----
     var S = { step:"service", sid:null, ymd:null, start:null, cal:null,
-              name:"", phone:"", email:"", notes:"", q:"", ref:null };
+              name:"", phone:"", email:"", notes:"", q:"", ref:null,
+              reRef:null, reOld:null, doneKind:null };
     var STEPS = ["service","date","time","details","review"];
 
     // ---- DOM ----
@@ -1061,7 +1063,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
 
     function open(sid){
       lastFocus=document.activeElement;
-      S.step="service"; S.q="";
+      S.step="service"; S.q=""; S.reRef=null; S.reOld=null; S.doneKind=null;
       if(sid){ S.sid=sid; S.step="date"; if(!S.cal) S.cal=midnight(new Date()); }
       root.hidden=false;
       document.documentElement.style.overflow="hidden";
@@ -1078,6 +1080,13 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     // ---- step navigation ----
     function go(step){ S.step=step; render(); if(elBody) elBody.scrollTop=0; }
     function back(){
+      if(S.reRef){
+        // reschedule skips the details step: date <- time <- review
+        var rmap={time:"date",review:"time"};
+        if(rmap[S.step]) return go(rmap[S.step]);
+        // backing out of the date step abandons the reschedule
+        S.reRef=null; S.reOld=null; return go("mine");
+      }
       var map={date:"service",time:"date",details:"time",review:"details",mine:"service"};
       if(map[S.step]) go(map[S.step]); else close();
     }
@@ -1088,15 +1097,17 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       var h="";
       STEPS.forEach(function(_,i){ h+='<i class="'+(i<idx?"done":i===idx?"on":"")+'"></i>'; });
       elSteps.innerHTML=h;
-      elSteps.style.display = (S.step==="mine"||idx<0) ? "none" : "flex";
+      elSteps.style.display = (S.step==="mine"||S.reRef||idx<0) ? "none" : "flex";
     }
 
     var TITLES={service:"Choose a service",date:"Pick a day",time:"Pick a time",
                 details:"Your details",review:"Review & confirm",done:"You're booked",mine:"My appointments"};
+    // titles while moving an existing appointment
+    var RTITLES={date:"Pick a new day",time:"Pick a new time",review:"Confirm new time",done:"Time updated"};
 
     function render(){
       progress();
-      elTitle.textContent=TITLES[S.step]||"Book an appointment";
+      elTitle.textContent=(S.reRef&&RTITLES[S.step])||TITLES[S.step]||"Book an appointment";
       elBack.hidden = !(S.step in {date:1,time:1,details:1,review:1,mine:1});
       elClose.hidden = false;
       ({service:rService,date:rDate,time:rTime,details:rDetails,review:rReview,done:rDone,mine:rMine}[S.step]||rService)();
@@ -1243,6 +1254,24 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     function rReview(){
       var s=svc(S.sid);
       var depTxt = s.depNum ? "$"+ (s.depNum%1?s.depNum.toFixed(2):s.depNum) : "None";
+      // rescheduling reuses this screen but confirms a time change, not a new booking
+      if(S.reRef){
+        var o=S.reOld||{};
+        elBody.innerHTML=
+          '<div class="pqcb-receipt">'+
+            rrow("Service", esc(s.name))+
+            rrow("New date", prettyDate(S.ymd), "date")+
+            rrow("New time", fmtMin(S.start)+" &ndash; "+fmtMin(S.start+s.durMin), "time")+
+            rrow("Was", (o.ymd?prettyShort(o.ymd):"")+(o.start!=null?" at "+fmtMin(o.start):""))+
+            rrow("Ref", esc(S.reRef))+
+          '</div>'+
+          '<div class="pqcb-note">Tap <b>Confirm new time</b> to move this appointment. '+
+            "We'll open a text so Rese can update the shop's book &mdash; your new slot is held on this phone in the meantime.</div>"+
+          '<button class="pqcb-btn wide" data-confirm>Confirm new time</button>';
+        elFoot.hidden=false;
+        elFoot.innerHTML='<span style="font-size:12px;opacity:.55">Free to change up to 24h before.</span>';
+        return;
+      }
       elBody.innerHTML=
         '<div class="pqcb-receipt">'+
           rrow("Service", esc(s.name), "service")+
@@ -1271,22 +1300,45 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
         '</b></div>';
     }
 
-    // STEP 6 — confirmed
+    // STEP 6 — outcome (booked / rescheduled / cancelled)
     function rDone(){
-      var b=S.confirmed;
+      var b=S.confirmed, kind=S.doneKind||"booked", cancelled=(kind==="cancel");
+      var depTxt = b.depNum ? ("$"+(b.depNum%1?b.depNum.toFixed(2):b.depNum)) : "";
+      elTitle.textContent = cancelled?"Appointment cancelled" : kind==="reschedule"?"Time updated" : "You're booked";
+
+      var mark = cancelled
+        ? '<div class="pqcb-check" style="background:#c0392b;color:#fff">&#10005;</div>'
+        : '<div class="pqcb-check">&#10003;</div>';
+
+      var note;
+      if(cancelled)
+        note="Removed from this phone. Tap <b>Text Rese to release it</b> so the shop frees your slot for someone else.";
+      else if(kind==="reschedule")
+        note="Moved on this phone. Tap <b>Text Rese the change</b> so the shop updates its book &mdash; then re-add it to your calendar.";
+      else if(b.depNum)
+        note="Saved on this phone. Tap <b>Text to confirm</b> so Rese can lock your "+depTxt+" deposit.";
+      else
+        note="Saved on this phone. See you soon &mdash; add it to your calendar so it doesn't slip.";
+
+      var actions="";
+      if(cancelled){
+        actions+='<a class="pqcb-btn wide" style="text-decoration:none;margin-bottom:10px" href="'+smsLink(b,"cancel")+'">Text Rese to release it</a>';
+      }else if(kind==="reschedule"){
+        actions+='<a class="pqcb-btn wide" style="text-decoration:none;margin-bottom:10px" href="'+smsLink(b,"reschedule")+'">Text Rese the change</a>'+
+                 '<button class="pqcb-btn2 wide" data-ics="'+b.ref+'" style="margin-bottom:10px">Update my calendar</button>';
+      }else{
+        if(b.depNum) actions+='<a class="pqcb-btn wide" style="text-decoration:none;margin-bottom:10px" href="'+smsLink(b,"confirm")+'">Text to confirm deposit</a>';
+        actions+='<button class="pqcb-btn2 wide" data-ics="'+b.ref+'" style="margin-bottom:10px">Add to calendar</button>';
+      }
+      actions+='<a class="pqcb-btn2 wide" style="text-decoration:none;margin-bottom:10px" href="tel:'+SHOP.tel+'">Call the shop</a>';
+
       elBody.innerHTML=
-        '<div class="pqcb-check">&#10003;</div>'+
+        mark+
         '<div style="text-align:center"><div class="pqcb-ref">'+esc(b.ref)+'</div></div>'+
         '<p class="pqcb-sub" style="text-align:center;margin:14px auto 18px;max-width:360px">'+
-          esc(b.sname)+' with Rese<br><b style="opacity:.9">'+prettyDate(b.ymd)+' at '+fmtMin(b.start)+'</b></p>'+
-        '<div class="pqcb-note" style="margin-bottom:18px">'+
-          (b.depNum
-            ? "Saved on this phone. Tap <b>Text to confirm</b> so Rese can lock your "+("$"+(b.depNum%1?b.depNum.toFixed(2):b.depNum))+" deposit."
-            : "Saved on this phone. See you soon &mdash; add it to your calendar so it doesn't slip.")+
-        '</div>'+
-        (b.depNum?'<a class="pqcb-btn wide" style="text-decoration:none;margin-bottom:10px" href="'+smsLink(b)+'">Text to confirm deposit</a>':"")+
-        '<button class="pqcb-btn2 wide" data-ics="'+b.ref+'" style="margin-bottom:10px">Add to calendar</button>'+
-        '<a class="pqcb-btn2 wide" style="text-decoration:none;margin-bottom:10px" href="tel:'+SHOP.tel+'">Call the shop</a>';
+          esc(b.sname)+' with Rese<br><b style="opacity:.9'+(cancelled?';text-decoration:line-through':"")+'">'+prettyDate(b.ymd)+' at '+fmtMin(b.start)+'</b></p>'+
+        '<div class="pqcb-note" style="margin-bottom:18px'+(cancelled?';background:color-mix(in srgb,#c0392b 10%,transparent);border-left-color:#c0392b':"")+'">'+note+'</div>'+
+        actions;
       elFoot.hidden=false;
       elFoot.innerHTML=
         '<button class="pqcb-link" data-mine>My appointments</button>'+
@@ -1307,16 +1359,19 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
             '<div class="pqcb-rrow big"><span>'+esc(b.sname)+'</span><b>'+esc(b.price)+'</b></div>'+
             '<div class="pqcb-rrow"><span>'+prettyShort(b.ymd)+'</span><b>'+fmtMin(b.start)+' &ndash; '+fmtMin(b.start+b.durMin)+'</b></div>'+
             '<div class="pqcb-rrow"><span>Ref</span><b style="letter-spacing:.08em">'+esc(b.ref)+'</b></div>'+
-            '<div style="display:flex;gap:8px;padding:12px 16px">'+
-              '<button class="pqcb-btn2" style="flex:1" data-ics="'+b.ref+'">Add to calendar</button>'+
+            '<div style="display:flex;gap:8px;padding:12px 16px 6px">'+
+              '<button class="pqcb-btn2" style="flex:1" data-resched="'+b.ref+'">Reschedule</button>'+
               '<button class="pqcb-btn2" style="flex:1;border-color:color-mix(in srgb,#c0392b 40%,transparent);color:#a5321f" data-cancel="'+b.ref+'">Cancel</button>'+
+            '</div>'+
+            '<div style="padding:0 16px 12px">'+
+              '<button class="pqcb-btn2 wide" data-ics="'+b.ref+'">Add to calendar</button>'+
             '</div>'+
           '</div>';
         });
       }
       elBody.innerHTML=body;
       elFoot.hidden=false;
-      elFoot.innerHTML='<span style="font-size:12px;opacity:.5">Stored on this device</span>'+
+      elFoot.innerHTML='<span style="font-size:12px;opacity:.5;line-height:1.4">Saved on this device &middot; text the shop to confirm changes</span>'+
         '<button class="pqcb-btn" data-new>Book another</button>';
     }
 
@@ -1324,7 +1379,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     function recap(which){
       var s=svc(S.sid), h='<div class="pqcb-recap">';
       if(which.indexOf("service")>=0 && s)
-        h+='<span class="pqcb-chip"><s>&#9986;</s>'+esc(s.name)+' &middot; '+esc(s.price)+'<button data-edit="service">change</button></span>';
+        h+='<span class="pqcb-chip"><s>&#9986;</s>'+esc(s.name)+' &middot; '+esc(s.price)+
+           (S.reRef?"":'<button data-edit="service">change</button>')+'</span>';
       if(which.indexOf("date")>=0 && S.ymd)
         h+='<span class="pqcb-chip"><s>&#128197;</s>'+prettyShort(S.ymd)+'<button data-edit="date">change</button></span>';
       if(which.indexOf("time")>=0 && S.start!=null)
@@ -1344,12 +1400,29 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       // guard: re-check the slot is still free on this device
       var open=slotsFor(fromYmd(S.ymd),s.durMin);
       if(open.indexOf(S.start)<0){ toast("That time was just taken — please pick another."); go("time"); return; }
+
+      // reschedule: move the existing record, keep its ref + contact details
+      if(S.reRef){
+        var all=load(), moved=null;
+        for(var i=0;i<all.length;i++){
+          if(all[i].ref===S.reRef){
+            all[i].prevYmd=all[i].ymd; all[i].prevStart=all[i].start;
+            all[i].ymd=S.ymd; all[i].start=S.start; all[i].durMin=s.durMin;
+            all[i].status="booked"; all[i].updated=Date.now();
+            moved=all[i];
+          }
+        }
+        store(all);
+        S.confirmed=moved; S.doneKind="reschedule"; S.reRef=null; S.reOld=null;
+        go("done"); return;
+      }
+
       var b={ ref:makeRef(), sid:s.id, sname:s.name, group:s.group, price:s.price,
               depNum:s.depNum, ymd:S.ymd, start:S.start, durMin:s.durMin,
               name:S.name, phone:S.phone, email:S.email, notes:S.notes,
               created:Date.now(), status:"booked" };
       var all=load(); all.push(b); store(all);
-      S.confirmed=b;
+      S.confirmed=b; S.doneKind="booked";
       go("done");
     }
 
@@ -1382,9 +1455,16 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
         toast("Calendar file downloaded.");
       }catch(e){ toast("Couldn't create the calendar file."); }
     }
-    function smsLink(b){
-      var body="Hi Rese, confirming my booking "+b.ref+": "+b.sname+" on "+prettyDate(b.ymd)+" at "+fmtMin(b.start)+
-               ". Name: "+b.name+", phone "+b.phone+"."+(b.depNum?(" Ready to send the deposit."):"");
+    function smsLink(b,kind){
+      var who=" Name: "+b.name+", phone "+b.phone+".", body;
+      if(kind==="cancel")
+        body="Hi Rese, I need to cancel my booking "+b.ref+": "+b.sname+" on "+prettyDate(b.ymd)+" at "+fmtMin(b.start)+"."+who;
+      else if(kind==="reschedule")
+        body="Hi Rese, I moved booking "+b.ref+" ("+b.sname+") to "+prettyDate(b.ymd)+" at "+fmtMin(b.start)+
+             (b.prevYmd?(" — was "+prettyShort(b.prevYmd)+" at "+fmtMin(b.prevStart)):"")+"."+who;
+      else
+        body="Hi Rese, confirming my booking "+b.ref+": "+b.sname+" on "+prettyDate(b.ymd)+" at "+fmtMin(b.start)+"."+who+
+             (b.depNum?" Ready to send the deposit.":"");
       return "sms:"+SHOP.tel+"?&body="+encodeURIComponent(body);
     }
 
@@ -1399,21 +1479,37 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       var el;
       if((el=t.closest("[data-sid]"))){ S.sid=el.getAttribute("data-sid"); S.ymd=null; S.start=null; if(!S.cal) S.cal=midnight(new Date()); go("date"); return; }
       if((el=t.closest("[data-day]"))){ if(el.classList.contains("off")) return; S.ymd=el.getAttribute("data-day"); S.start=null; go("time"); return; }
-      if((el=t.closest("[data-slot]"))){ S.start=parseInt(el.getAttribute("data-slot"),10); go("details"); return; }
+      if((el=t.closest("[data-slot]"))){ S.start=parseInt(el.getAttribute("data-slot"),10); go(S.reRef?"review":"details"); return; }
       if((el=t.closest("[data-mon]"))){ var dir=parseInt(el.getAttribute("data-mon"),10); S.cal=new Date(S.cal.getFullYear(),S.cal.getMonth()+dir,1); rDate(); return; }
       if((el=t.closest("[data-edit]"))){ go(el.getAttribute("data-edit")); return; }
       if(t.closest("[data-confirm]")){ confirmBooking(); return; }
       if((el=t.closest("[data-ics]"))){ var b=findRef(el.getAttribute("data-ics")); if(b) downloadICS(b); return; }
+      if((el=t.closest("[data-resched]"))){ startReschedule(el.getAttribute("data-resched")); return; }
       if((el=t.closest("[data-cancel]"))){ cancelRef(el.getAttribute("data-cancel")); return; }
-      if(t.closest("[data-mine]")){ go("mine"); return; }
-      if(t.closest("[data-new]")){ S.sid=null;S.ymd=null;S.start=null; go("service"); return; }
+      if(t.closest("[data-mine]")){ S.reRef=null; S.reOld=null; go("mine"); return; }
+      if(t.closest("[data-new]")){ S.sid=null;S.ymd=null;S.start=null;S.reRef=null;S.reOld=null;S.doneKind=null; go("service"); return; }
     });
 
     function findRef(ref){ var a=load(); for(var i=0;i<a.length;i++) if(a[i].ref===ref) return a[i]; return null; }
+
+    // begin moving an existing appointment: preload its service + contact, jump to the calendar
+    function startReschedule(ref){
+      var b=findRef(ref); if(!b) return;
+      if(!svc(b.sid)){ toast("That service isn't offered anymore — please call the shop."); return; }
+      S.reRef=ref; S.reOld={ ymd:b.ymd, start:b.start };
+      S.sid=b.sid; S.name=b.name; S.phone=b.phone; S.email=b.email||""; S.notes=b.notes||"";
+      S.ymd=b.ymd; S.start=b.start; S.cal=midnight(fromYmd(b.ymd));
+      go("date");
+    }
+
     function cancelRef(ref){
+      var b=findRef(ref); if(!b) return;
+      if(!window.confirm("Cancel your "+b.sname+" on "+prettyShort(b.ymd)+" at "+fmtMin(b.start)+"?")) return;
       var a=load();
-      for(var i=0;i<a.length;i++) if(a[i].ref===ref) a[i].status="cancelled";
-      store(a); toast("Appointment cancelled."); rMine();
+      for(var i=0;i<a.length;i++) if(a[i].ref===ref){ a[i].status="cancelled"; a[i].cancelled=Date.now(); }
+      store(a);
+      S.confirmed=b; S.doneKind="cancel";
+      go("done");
     }
 
     // ---- page hooks: any [data-book] / #book-now anchor opens the engine ----
