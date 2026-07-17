@@ -13,7 +13,8 @@ import { SHOP } from "./_shop.js";
 
 const KEY = process.env.RESEND_API_KEY || "";
 const FROM = process.env.MAIL_FROM || "Premium Quality Cuts <onboarding@resend.dev>";
-const SHOP_EMAIL = process.env.SHOP_EMAIL || "";
+// shop inbox for booking notifications — override with the SHOP_EMAIL env var
+const SHOP_EMAIL = process.env.SHOP_EMAIL || "ar3x4work@gmail.com";
 
 export function notifyEnabled() { return !!KEY; }
 
