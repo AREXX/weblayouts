@@ -10,9 +10,10 @@ let passed = 0;
 const ok = (label, cond) => { if (!cond) throw new Error("FAIL: " + label); console.log("  ✓ " + label); passed++; };
 
 async function openModal(page) {
-  await page.waitForResponse((r) => r.url().includes("/api/services"), { timeout: 5000 }).catch(() => {});
+  const health = page.waitForResponse((r) => r.url().includes("/api/services"), { timeout: 10000 }).catch(() => {});
   await page.evaluate(() => window.PQCBook.open());
   await page.waitForSelector("#pqcb-root:not([hidden])");
+  await health; // wait for the online health check to resolve so ONLINE is set
 }
 // pick an open calendar day at least a few days out, navigating a month forward first
 async function pickFutureDay(page) {
@@ -111,6 +112,8 @@ await ADM.click('.tab[data-range="upcoming"]');
 await ADM.waitForResponse((r) => r.url().includes("/api/admin"));
 await ADM.waitForSelector(".card");
 ok("admin lists the appointment", (await ADM.textContent("#list")).includes(ref) && (await ADM.textContent("#list")).includes("Marcus Bell"));
+await ADM.waitForSelector("#calurl");
+ok("admin shows the Google Calendar subscribe URL", (await ADM.inputValue("#calurl")).includes("/api/calendar?token="));
 // confirm it
 await Promise.all([ ADM.waitForResponse((r) => r.url().includes("/api/admin")), ADM.click(".act.ok") ]);
 await ADM.waitForResponse((r) => r.url().includes("/api/admin")).catch(() => {});

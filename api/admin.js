@@ -8,6 +8,7 @@ import { db, rowToBooking } from "./_db.js";
 import { notify } from "./_notify.js";
 
 const ACTION_STATUS = { confirm: "confirmed", cancel: "cancelled", noshow: "noshow", book: "booked" };
+const CAL_TOKEN = process.env.CALENDAR_TOKEN || "dev-calendar-token";
 
 export default handler(["GET", "POST"], async (req, res) => {
   if (!adminOk(req)) return sendJson(res, 401, { ok: false, error: "Unauthorized" });
@@ -23,7 +24,7 @@ export default handler(["GET", "POST"], async (req, res) => {
     const { rows } = await client.query(
       `SELECT * FROM bookings ${where} ORDER BY ymd ASC, start_min ASC`, params
     );
-    return sendJson(res, 200, { ok: true, today, bookings: rows.map(rowToBooking) });
+    return sendJson(res, 200, { ok: true, today, calendar: "/api/calendar?token=" + encodeURIComponent(CAL_TOKEN), bookings: rows.map(rowToBooking) });
   }
 
   // POST — status action
