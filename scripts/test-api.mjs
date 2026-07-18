@@ -17,7 +17,11 @@ function call(fn, { method = "GET", query = {}, body, headers = {} } = {}) {
     const res = {
       statusCode: 200, _headers: {}, writableEnded: false,
       setHeader(k, v) { this._headers[k.toLowerCase()] = v; },
-      end(s) { this.writableEnded = true; try { resolve({ status: this.statusCode, body: s ? JSON.parse(s) : null }); } catch (e) { reject(e); } },
+      end(s) {
+        this.writableEnded = true;
+        let body = null; try { body = s ? JSON.parse(s) : null; } catch { /* non-JSON (e.g. iCalendar) */ }
+        resolve({ status: this.statusCode, text: s || "", body });
+      },
     };
     Promise.resolve(fn(req, res)).catch(reject);
   });
@@ -94,8 +98,16 @@ const run = async () => {
   ok("old slot freed after reschedule", r.body.slots.includes(slot));
   ok("new slot taken after reschedule", !r.body.slots.includes(neighbour));
 
+  // calendar subscription feed (booking is active here)
+  const calendar = await load("calendar");
+  r = await call(calendar, { query: { token: "dev-calendar-token" } });
+  ok("calendar feed returns iCalendar for a valid token", r.status === 200 && r.text.includes("BEGIN:VCALENDAR") && r.text.includes("BEGIN:VEVENT") && r.text.includes(ref));
+  ok("calendar feed event carries the client + service", r.text.includes("Test User") && r.text.includes("Line Up"));
+  ok("calendar feed rejects a bad token", (await call(calendar, { query: { token: "wrong" } })).status === 403);
+
   // admin auth
   ok("admin GET without PIN → 401", (await call(admin, { query: { range: "upcoming" } })).status === 401);
+  ok("admin GET returns the calendar subscribe URL", (await call(admin, { query: { range: "upcoming" }, headers: { "x-admin-pin": "4242" } })).body.calendar.includes("/api/calendar?token="));
   r = await call(admin, { query: { range: "upcoming" }, headers: { "x-admin-pin": "4242" } });
   ok("admin GET with PIN lists bookings", r.status === 200 && r.body.bookings.some((b) => b.ref === ref));
   r = await call(admin, { method: "POST", body: { action: "confirm", ref }, headers: { "x-admin-pin": "4242" } });

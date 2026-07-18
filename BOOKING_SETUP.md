@@ -42,9 +42,10 @@ You don't change how you deploy — push and Vercel builds it. Two one-time step
 
 Project → **Settings** → **Environment Variables**:
 
-| Name        | Value                    | Notes                                        |
-|-------------|--------------------------|----------------------------------------------|
-| `ADMIN_PIN` | *(a PIN you choose)*     | Protects `admin.html`. **Set this** — it defaults to `1234` if unset. |
+| Name             | Value                    | Notes                                        |
+|------------------|--------------------------|----------------------------------------------|
+| `ADMIN_PIN`      | *(a PIN you choose)*     | Protects `admin.html`. **Set this** — it defaults to `1234` if unset. |
+| `CALENDAR_TOKEN` | *(a long random string)* | Secret in the Google Calendar feed URL (see §4). **Set this** — it defaults to `dev-calendar-token` if unset. Use something unguessable, e.g. a 32-char random string. |
 
 Redeploy so the variables take effect. That's it:
 
@@ -72,6 +73,25 @@ Which emails fire:
 - **Customer books / reschedules / cancels** → email to the shop **and** to the
   customer (customer email only if they entered one — it's an optional field).
 - **Barber confirms or cancels from `admin.html`** → email to the customer.
+
+### 4. Google Calendar (subscribe to the appointment feed)
+
+The API publishes a private calendar feed that Google Calendar (or Apple/Outlook)
+can **subscribe** to — appointments then appear in your calendar automatically.
+
+1. Set the `CALENDAR_TOKEN` env var (see §2) to a long random string and redeploy.
+2. Open **`…/admin.html`**, enter your PIN — the top shows a **"Sync to Google
+   Calendar"** box with your private feed URL and a Copy button.
+3. In **Google Calendar** → left sidebar → **Other calendars → ＋ → From URL** →
+   paste the link → **Add calendar**.
+
+Notes:
+- The link contains the secret token — **keep it private** (anyone with it can read
+  the appointment list). Rotate it by changing `CALENDAR_TOKEN` and redeploying.
+- It's **read-only** and Google refreshes subscribed URLs on its own schedule
+  (typically within an hour, not instant). For instant/two-way sync you'd use the
+  Google account OAuth approach instead.
+- The feed shows active (booked/confirmed) appointments; cancellations drop off.
 
 ## Run it locally (no accounts, no database)
 

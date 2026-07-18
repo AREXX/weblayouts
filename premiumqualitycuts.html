@@ -1092,7 +1092,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     // ---- state ----
     var S = { step:"service", sid:null, ymd:null, start:null, cal:null,
               name:"", phone:"", email:"", notes:"", q:"", ref:null,
-              reRef:null, reOld:null, doneKind:null, _slots:null, _slotsKey:null };
+              reRef:null, reOld:null, doneKind:null, _slots:null, _slotsKey:null, _health:null };
     var STEPS = ["service","date","time","details","review"];
 
     // ---- DOM ----
@@ -1120,8 +1120,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
       document.documentElement.style.overflow="hidden";
       document.body.style.overflow="hidden";
       render();
-      // health-check the backend; if reachable, refresh any open list with live data
-      checkOnline().then(function(){ if(!root.hidden && S.step==="mine") rMine(); });
+      // health-check the backend; if reachable, refresh any open list with live data.
+      // S._health lets the time step wait for this to resolve instead of guessing offline.
+      S._health = checkOnline();
+      S._health.then(function(){ if(!root.hidden && S.step==="mine") rMine(); });
     }
     function close(){
       root.hidden=true;
@@ -1249,6 +1251,15 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px soli
     // across devices); otherwise it falls back to the local slot calculation.
     function rTime(){
       var s=svc(S.sid), key=S.ymd+"|"+S.sid;
+      // if the backend health check is still in flight, wait for it before
+      // deciding online vs offline (avoids showing stale local slots on a slow check)
+      if(S._health){
+        var h=S._health; S._health=null;
+        elBody.innerHTML=recap(["service","date"])+'<div class="pqcb-empty">Checking live availability&hellip;</div>';
+        elFoot.hidden=true;
+        h.then(function(){ if(S.step==="time") rTime(); });
+        return;
+      }
       if(ONLINE){
         if(S._slotsKey===key && S._slots){ renderSlots(S._slots); return; }
         elBody.innerHTML=recap(["service","date"])+'<div class="pqcb-empty">Checking live availability&hellip;</div>';
